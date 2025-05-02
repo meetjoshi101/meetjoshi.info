@@ -1,12 +1,13 @@
 ---
 import '../styles/global.css';
+import Navbar from '../components/layout/Navbar.astro';
+
 interface Props {
     title: string;
     description?: string;
 }
 
 const { title, description = "My Portfolio Website" } = Astro.props;
-import Navbar from '../components/Navbar.astro';
 ---
 
 <html lang="en">

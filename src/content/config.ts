@@ -23,7 +23,17 @@ const projectCollection = defineCollection({
     }),
 });
 
+const siteContentCollection = defineCollection({
+    schema: z.object({
+        section: z.string(),
+        title: z.string(),
+        subtitle: z.string().optional(),
+        displayOrder: z.number().default(0),
+    }),
+});
+
 export const collections = {
     'blogs': blogCollection,
     'projects': projectCollection,
+    'site-content': siteContentCollection,
 };
