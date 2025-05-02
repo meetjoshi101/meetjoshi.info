@@ -1,5 +1,9 @@
 @import "tailwindcss";
-/* Custom styles that extend Tailwind */
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+  logs: true;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -8,15 +12,15 @@
 
 @layer components {
   .prose h2 {
-    @apply text-2xl font-bold text-blue-600 mt-8 mb-4;
+    @apply text-2xl font-bold mt-8 mb-4;
   }
 
   .prose h3 {
-    @apply text-xl font-semibold text-blue-600 mt-6 mb-3;
+    @apply text-xl font-semibold mt-6 mb-3;
   }
 
   .prose p {
-    @apply text-gray-700 leading-relaxed mb-4;
+    @apply leading-relaxed mb-4;
   }
 
   .prose ul {
@@ -24,24 +28,24 @@
   }
 
   .prose ul li {
-    @apply flex items-start text-gray-700;
+    @apply flex items-start;
   }
 
   .prose ul li::before {
     content: "";
-    @apply w-2 h-2 bg-blue-600 rounded-full mr-3 mt-2 flex-shrink-0;
+    @apply w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0;
   }
 
   .contact-links a {
-    @apply text-blue-600 hover:text-blue-700 underline decoration-2 underline-offset-2 transition-colors font-medium;
+    @apply link link-primary font-medium;
   }
 
   .contact-links ul li strong {
-    @apply text-gray-900 font-semibold mr-2;
+    @apply font-semibold mr-2;
   }
 
   .contact-links ul {
-    @apply divide-y divide-gray-100;
+    @apply divide-y divide-base-200;
   }
 
   .contact-links ul li {
@@ -61,6 +65,6 @@
 
 @layer utilities {
   .section-divider {
-    @apply w-24 h-1 bg-blue-600 mx-auto rounded-full;
+    @apply divider divider-primary w-24 mx-auto;
   }
 }

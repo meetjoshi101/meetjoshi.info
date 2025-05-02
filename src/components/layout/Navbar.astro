@@ -1,47 +1,29 @@
 ---
 ---
 
-<nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-            <div class="flex-shrink-0">
-                <a href="/" class="text-2xl font-bold text-blue-600">Portfolio</a>
-            </div>
-            <div class="hidden md:flex md:items-center md:space-x-8">
-                <a href="/projects" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Projects</a>
-                <a href="/blogs" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Blog</a>
-                <a href="/#about" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">About</a>
-                <a href="/#contact" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Contact</a>
-            </div>
-            <!-- Mobile menu button -->
-            <div class="md:hidden">
-                <button type="button" id="mobile-menu-button" class="text-gray-700 hover:text-blue-600">
-                    <span class="sr-only">Open main menu</span>
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
-            </div>
+<div class="navbar bg-base-100 fixed top-0 z-50 shadow-sm backdrop-blur-sm bg-opacity-90">
+    <div class="navbar-start">
+        <div class="dropdown">
+            <label tabindex={0} class="btn btn-ghost lg:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+                </svg>
+            </label>
+            <ul tabindex={0} class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/blogs">Blog</a></li>
+                <li><a href="/#about">About</a></li>
+                <li><a href="/#contact">Contact</a></li>
+            </ul>
         </div>
+        <a href="/" class="btn btn-ghost normal-case text-xl">Portfolio</a>
     </div>
-    <!-- Mobile menu -->
-    <div class="hidden md:hidden" id="mobile-menu">
-        <div class="px-2 pt-2 pb-3 space-y-1">
-            <a href="/projects" class="block px-3 py-2 text-gray-700 hover:text-blue-600 font-medium transition-colors">Projects</a>
-            <a href="/blogs" class="block px-3 py-2 text-gray-700 hover:text-blue-600 font-medium transition-colors">Blog</a>
-            <a href="/#about" class="block px-3 py-2 text-gray-700 hover:text-blue-600 font-medium transition-colors">About</a>
-            <a href="/#contact" class="block px-3 py-2 text-gray-700 hover:text-blue-600 font-medium transition-colors">Contact</a>
-        </div>
+    <div class="navbar-end hidden lg:flex">
+        <ul class="menu menu-horizontal px-1">
+            <li><a href="/projects">Projects</a></li>
+            <li><a href="/blogs">Blog</a></li>
+            <li><a href="/#about">About</a></li>
+            <li><a href="/#contact">Contact</a></li>
+        </ul>
     </div>
-</nav>
-
-<script>
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-
-    if (mobileMenuButton && mobileMenu) {
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-    }
-</script>
+</div>
