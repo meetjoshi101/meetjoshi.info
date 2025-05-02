@@ -1,6 +1,6 @@
 ---
 section: "hero"
-title: "Hi, I'm Your Name"
+title: "Hi, I'm Meet Joshi"
 subtitle: "Full-Stack Developer"
 displayOrder: 1
 ---
