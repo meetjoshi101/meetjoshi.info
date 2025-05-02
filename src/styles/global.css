@@ -1,7 +1,39 @@
 @import "tailwindcss";
-@plugin "daisyui" {
-  themes: light --default, dark --prefersdark;
-  logs: true;
+
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "anothertown";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(14% 0 0);
+  --color-base-200: oklch(20% 0 0);
+  --color-base-300: oklch(26% 0 0);
+  --color-base-content: oklch(97% 0 0);
+  --color-primary: oklch(90% 0.182 98.111);
+  --color-primary-content: oklch(42% 0.095 57.708);
+  --color-secondary: oklch(68% 0.162 75.834);
+  --color-secondary-content: oklch(98% 0.026 102.212);
+  --color-accent: oklch(64% 0.2 131.684);
+  --color-accent-content: oklch(98% 0.031 120.757);
+  --color-neutral: oklch(43% 0 0);
+  --color-neutral-content: oklch(98% 0 0);
+  --color-info: oklch(54% 0.245 262.881);
+  --color-info-content: oklch(97% 0.014 254.604);
+  --color-success: oklch(60% 0.118 184.704);
+  --color-success-content: oklch(98% 0.014 180.72);
+  --color-warning: oklch(64% 0.222 41.116);
+  --color-warning-content: oklch(98% 0.016 73.684);
+  --color-error: oklch(59% 0.249 0.584);
+  --color-error-content: oklch(97% 0.014 343.198);
+  --radius-selector: 1rem;
+  --radius-field: 1rem;
+  --radius-box: 1rem;
+  --size-selector: 0.21875rem;
+  --size-field: 0.21875rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 1;
 }
 
 @layer base {
@@ -52,15 +84,15 @@
     @apply py-2;
   }
 
-  @screen sm {
-    .contact-links ul li {
-      @apply flex items-center justify-between;
+  @media (min-width: 640px) {
+      .contact-links ul li {
+        @apply flex items-center justify-between;
+      }
+  
+      .contact-links ul li::before {
+        @apply hidden;
+      }
     }
-
-    .contact-links ul li::before {
-      @apply hidden;
-    }
-  }
 }
 
 @layer utilities {
