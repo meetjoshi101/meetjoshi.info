@@ -1,9 +1,6 @@
 name: Deploy to GitHub Pages
 
 on:
-  # Trigger the workflow every time you push to the `main` branch
-  push:
-    branches: [ master ]
   # Trigger the workflow on pull request events but only for the main branch
   pull_request:
     types: [closed]
