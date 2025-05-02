@@ -1,21 +1,14 @@
 ---
 section: "about"
-title: "About Me"
+title: "👨 About Me"
 displayOrder: 2
 ---
+I’m a confident and results-driven software developer 💻 with over 3 years of experience building scalable, high-performance web applications using Angular, Node.js, and SQL.
 
-I'm a passionate developer focused on creating elegant solutions to complex problems. With expertise in modern web technologies, I build responsive and user-friendly applications with a focus on performance and user experience.
+With experience across life sciences 🧬, oil & gas 🛢️, HR systems 👥, and developer tools 🛠️, I thrive in environments that demand creative problem-solving and strategic thinking. I’m not just focused on writing clean code — I’m always looking for innovative ways to solve real business challenges 💡.
 
-## Technical Expertise
+As a team leader 🤝, I’ve successfully guided software development teams, delivering projects with precision while fostering collaboration and growth. I approach every project with clear strategic intent and the willingness to get my hands dirty — ensuring outcomes that are both technically sound and business-aligned ⚙️🎯.
 
-### Frontend Development
-- HTML5 & CSS3 with modern layouts and animations
-- JavaScript (ES6+) and TypeScript
-- React ecosystem and state management
-- Astro for static site generation
+I’m passionate about turning complexity into clarity. Whether it’s designing intuitive user interfaces 🎨, optimizing back-end systems 🔧, or leading high-impact sprints 🚀, I bring a strong blend of technical expertise, creativity, and business-first thinking.
 
-### Backend Development
-- Node.js and Express for API development
-- SQL databases and data modeling
-- RESTful APIs and GraphQL
-- Cloud deployment and DevOps
+Always learning, always building — I’m driven by the challenge of creating software that makes a real difference 🌱.
