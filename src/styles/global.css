@@ -7,9 +7,60 @@
 }
 
 @layer components {
-  /* Add any custom component styles here if needed */
+  .prose h2 {
+    @apply text-2xl font-bold text-blue-600 mt-8 mb-4;
+  }
+
+  .prose h3 {
+    @apply text-xl font-semibold text-blue-600 mt-6 mb-3;
+  }
+
+  .prose p {
+    @apply text-gray-700 leading-relaxed mb-4;
+  }
+
+  .prose ul {
+    @apply space-y-2 my-4;
+  }
+
+  .prose ul li {
+    @apply flex items-start text-gray-700;
+  }
+
+  .prose ul li::before {
+    content: "";
+    @apply w-2 h-2 bg-blue-600 rounded-full mr-3 mt-2 flex-shrink-0;
+  }
+
+  .contact-links a {
+    @apply text-blue-600 hover:text-blue-700 underline decoration-2 underline-offset-2 transition-colors font-medium;
+  }
+
+  .contact-links ul li strong {
+    @apply text-gray-900 font-semibold mr-2;
+  }
+
+  .contact-links ul {
+    @apply divide-y divide-gray-100;
+  }
+
+  .contact-links ul li {
+    @apply py-2;
+  }
+
+  @screen sm {
+    .contact-links ul li {
+      @apply flex items-center justify-between;
+    }
+
+    .contact-links ul li::before {
+      @apply hidden;
+    }
+  }
 }
 
 @layer utilities {
-  /* Add any custom utility classes here if needed */
+  .section-divider {
+    @apply w-24 h-1 bg-blue-600 mx-auto rounded-full;
+  }
 }
