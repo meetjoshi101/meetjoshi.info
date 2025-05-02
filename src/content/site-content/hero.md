@@ -1,8 +1,15 @@
 ---
 section: "hero"
-title: "Hi, I'm Meet Joshi"
-subtitle: "Full-Stack Developer"
+title: "👋 Hi there!"
+subtitle: " I'm Meet Joshi"
 displayOrder: 1
 ---
 
-I create beautiful and functional websites with modern technologies.
+Looking for a developer who can jump in,
+understand your business, <br>
+and get things done?
+
+You’re in the right place.
+
+I’m a software developer with 3+ years of experience building scalable, production-grade apps using Angular, Node.js, and SQL.
+Tech is never a limitation — I adapt fast, learn what’s needed, and focus on solving real business problems.

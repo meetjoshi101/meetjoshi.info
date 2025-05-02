@@ -6,17 +6,18 @@ const { title, subtitle } = heroContent?.data ?? { title: '', subtitle: '' };
 const { Content } = await (heroContent?.render() ?? { Content: () => null });
 ---
 
-<div class="hero min-h-screen bg-gradient-to-br from-base-200 to-transparent">
-    <div class="hero-content text-center">
-        <div class="max-w-3xl">
-            <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-4">
+<div class="flex pt-36 pl-6 min-h-screen bg-gradient-to-br from-base-200 to-transparent">
+    <div class="text-start">
+        <div class="max-w-4xl">
+            <h1 class="text-4xl md:text-4xl font-medium leading-tight mb-4">
                 {title}
             </h1>
-            <p class="text-2xl text-primary mb-6">{subtitle}</p>
-            <div class="text-xl opacity-90 mb-8 prose mx-auto">
+            <p class="text-5xl text-primary mb-6 font-black">{subtitle}</p>
+            <div class="text-2xl opacity-90 mb-8 prose mx-auto">
                 <Content />
             </div>
             <div class="flex gap-4 justify-center">
+                <a href="#contact" class="btn btn-dash btn-primary">My Resume</a>
                 <a href="#contact" class="btn btn-primary">Contact Me</a>
                 <a href="#projects" class="btn btn-outline btn-primary">View My Work</a>
             </div>
