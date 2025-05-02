@@ -1,0 +1,94 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import MainLayout from '../../layouts/MainLayout.astro';
+
+export async function getStaticPaths() {
+    const posts = await getCollection('blogs');
+    return posts.map((post) => ({
+        params: { slug: post.slug },
+        props: { post },
+    }));
+}
+
+interface Props {
+    post: CollectionEntry<'blogs'>;
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+const formattedDate = post.data.publishDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+});
+---
+
+<MainLayout title={post.data.title}>
+    <article class="py-20">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            {post.data.image && (
+                <img 
+                    src={post.data.image}
+                    alt={post.data.title}
+                    class="w-full h-[400px] object-cover rounded-xl mb-8"
+                />
+            )}
+            <div class="flex gap-2 mb-4">
+                {post.data.tags.map((tag) => (
+                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+                        {tag}
+                    </span>
+                ))}
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                {post.data.title}
+            </h1>
+            <div class="flex items-center gap-4 text-gray-600 mb-8">
+                <span>By {post.data.author}</span>
+                <span>•</span>
+                <time datetime={post.data.publishDate.toISOString()}>
+                    {formattedDate}
+                </time>
+            </div>
+            <div class="prose-content">
+                <Content />
+            </div>
+        </div>
+    </article>
+</MainLayout>
+
+<style>
+    @import '../../styles/global.css';
+    /* Base styles for markdown content */
+    .prose-content :global(h1) {
+        @apply text-4xl font-bold mb-6 mt-12;
+    }
+    .prose-content :global(h2) {
+        @apply text-2xl font-bold mb-4 mt-8;
+    }
+    .prose-content :global(h3) {
+        @apply text-xl font-bold mb-3 mt-6;
+    }
+    .prose-content :global(p) {
+        @apply mb-4 text-gray-700;
+    }
+    .prose-content :global(ul) {
+        @apply list-disc list-inside mb-4;
+    }
+    .prose-content :global(ol) {
+        @apply list-decimal list-inside mb-4;
+    }
+    .prose-content :global(a) {
+        @apply text-blue-600 hover:underline;
+    }
+    .prose-content :global(code) {
+        @apply bg-gray-100 px-1 rounded;
+    }
+    .prose-content :global(pre) {
+        @apply bg-gray-100 p-4 rounded-lg mb-4 overflow-x-auto;
+    }
+    .prose-content :global(blockquote) {
+        @apply border-l-4 border-gray-200 pl-4 italic;
+    }
+</style>

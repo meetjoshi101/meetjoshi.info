@@ -1,0 +1,15 @@
+@import "tailwindcss";
+/* Custom styles that extend Tailwind */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Add any custom component styles here if needed */
+}
+
+@layer utilities {
+  /* Add any custom utility classes here if needed */
+}

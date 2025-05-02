@@ -1,5 +1,35 @@
 ---
+import '../styles/global.css';
+import Navbar from '../components/Navbar.astro';
+import Hero from '../components/Hero.astro';
+import ProjectCard from '../components/ProjectCard.astro';
 
+const projects = [
+    {
+        title: "E-commerce Platform",
+        description: "A full-stack e-commerce platform with shopping cart, user authentication, and payment integration.",
+        technologies: ["React", "Node.js", "MongoDB", "Stripe"],
+        imageUrl: "/projects/ecommerce.jpg",
+        projectUrl: "https://ecommerce-demo.com",
+        githubUrl: "https://github.com/yourusername/ecommerce"
+    },
+    {
+        title: "Task Management App",
+        description: "A responsive task management application with real-time updates and team collaboration features.",
+        technologies: ["Vue.js", "Firebase", "Tailwind CSS"],
+        imageUrl: "/projects/taskmanager.jpg",
+        projectUrl: "https://task-manager-demo.com",
+        githubUrl: "https://github.com/yourusername/task-manager"
+    },
+    {
+        title: "Weather Dashboard",
+        description: "A weather dashboard that displays current weather and forecasts using weather API integration.",
+        technologies: ["JavaScript", "API", "CSS3"],
+        imageUrl: "/projects/weather.jpg",
+        projectUrl: "https://weather-demo.com",
+        githubUrl: "https://github.com/yourusername/weather-app"
+    }
+];
 ---
 
 <html lang="en">
@@ -8,9 +38,87 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>Your Name - Portfolio</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 	</head>
-	<body>
-		<h1>Astro</h1>
+	<body class="bg-gray-50">
+		<Navbar />
+		<main>
+			<Hero />
+			
+			<section id="about" class="py-20">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<h2 class="text-4xl font-bold text-gray-900 mb-8">About Me</h2>
+					<p class="text-lg text-gray-700 max-w-3xl">
+						I'm a passionate developer focused on creating elegant solutions to complex problems. 
+						With expertise in modern web technologies, I build responsive and user-friendly applications.
+					</p>
+				</div>
+			</section>
+
+			<section id="projects" class="py-20 bg-white">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<h2 class="text-4xl font-bold text-gray-900 mb-12">My Projects</h2>
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+						{projects.map((project) => (
+							<ProjectCard {...project} />
+						))}
+					</div>
+				</div>
+			</section>
+
+			<section id="skills" class="py-20">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<h2 class="text-4xl font-bold text-gray-900 mb-12">Skills</h2>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+						<div class="bg-white p-6 rounded-xl shadow-lg">
+							<h3 class="text-xl font-bold text-blue-600 mb-4">Frontend</h3>
+							<ul class="space-y-2">
+								<li class="text-gray-700">HTML5 & CSS3</li>
+								<li class="text-gray-700">JavaScript</li>
+								<li class="text-gray-700">React</li>
+								<li class="text-gray-700">Astro</li>
+							</ul>
+						</div>
+						<div class="bg-white p-6 rounded-xl shadow-lg">
+							<h3 class="text-xl font-bold text-blue-600 mb-4">Backend</h3>
+							<ul class="space-y-2">
+								<li class="text-gray-700">Node.js</li>
+								<li class="text-gray-700">Express</li>
+								<li class="text-gray-700">SQL</li>
+								<li class="text-gray-700">APIs</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="contact" class="py-20 bg-white">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+					<h2 class="text-4xl font-bold text-gray-900 mb-4">Contact Me</h2>
+					<p class="text-lg text-gray-700 mb-8">I'm always open to new opportunities. Get in touch!</p>
+					<div class="flex justify-center gap-4">
+						<a href="mailto:your.email@example.com" 
+						   class="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+							Email Me
+						</a>
+						<a href="https://github.com/yourusername" 
+						   class="px-6 py-3 border-2 border-blue-600 text-blue-600 rounded-lg font-medium hover:bg-blue-600 hover:text-white transition-colors"
+						   target="_blank" 
+						   rel="noopener noreferrer">
+							GitHub
+						</a>
+						<a href="https://linkedin.com/in/yourusername" 
+						   class="px-6 py-3 border-2 border-blue-600 text-blue-600 rounded-lg font-medium hover:bg-blue-600 hover:text-white transition-colors"
+						   target="_blank" 
+						   rel="noopener noreferrer">
+							LinkedIn
+						</a>
+					</div>
+				</div>
+			</section>
+		</main>
 	</body>
 </html>

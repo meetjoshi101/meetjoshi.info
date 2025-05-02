@@ -1,0 +1,49 @@
+---
+interface Props {
+    title: string;
+    description: string;
+    technologies: string[];
+    imageUrl?: string;
+    projectUrl?: string;
+    githubUrl?: string;
+}
+
+const { title, description, technologies, imageUrl, projectUrl, githubUrl } = Astro.props;
+---
+
+<div class="bg-white rounded-xl overflow-hidden shadow-lg transition-transform hover:-translate-y-1">
+    {imageUrl && (
+        <div class="w-full h-48 overflow-hidden">
+            <img src={imageUrl} alt={title} class="w-full h-full object-cover" />
+        </div>
+    )}
+    <div class="p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-3">{title}</h3>
+        <p class="text-gray-700 mb-4">{description}</p>
+        <div class="flex flex-wrap gap-2 mb-6">
+            {technologies.map((tech) => (
+                <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+                    {tech}
+                </span>
+            ))}
+        </div>
+        <div class="flex gap-4">
+            {projectUrl && (
+                <a href={projectUrl} 
+                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                   target="_blank" 
+                   rel="noopener noreferrer">
+                    View Live
+                </a>
+            )}
+            {githubUrl && (
+                <a href={githubUrl} 
+                   class="inline-flex items-center px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-colors"
+                   target="_blank" 
+                   rel="noopener noreferrer">
+                    View Code
+                </a>
+            )}
+        </div>
+    </div>
+</div>
