@@ -1,9 +1,8 @@
 name: Deploy to GitHub Pages
 
 on:
-  # Trigger the workflow on pull request events but only for the main branch
-  pull_request:
-    types: [closed]
+  # Trigger the workflow on merge commits to the master branch
+  push:
     branches: [ master ]
   # Allows you to run this workflow manually from the Actions tab on GitHub.
   workflow_dispatch:
