@@ -29,6 +29,12 @@ const siteContentCollection = defineCollection({
         title: z.string(),
         subtitle: z.string().optional(),
         displayOrder: z.number().default(0),
+        technical: z.array(z.object({
+            title: z.string(),
+            color: z.string(),
+            items: z.array(z.string())
+        })).optional(),
+        softSkills: z.array(z.string()).optional()
     }),
 });
 

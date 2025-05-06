@@ -2,6 +2,7 @@
 import MainLayout from '../layouts/MainLayout.astro';
 import Hero from '../components/sections/Hero.astro';
 import ProjectCard from '../components/common/ProjectCard.astro';
+import Skills from '../components/sections/Skills.astro';
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 
 // Get the latest projects and blogs
@@ -9,6 +10,7 @@ const projects = await getCollection('projects');
 const blogs = await getCollection('blogs');
 const aboutContent = await getEntry('site-content', 'about');
 const contactContent = await getEntry('site-content', 'contact');
+const skillsContent = await getEntry('site-content', 'skills');
 
 // Sort by publish date and get the latest items
 projects.sort((a: CollectionEntry<'projects'>, b: CollectionEntry<'projects'>) => 
@@ -23,6 +25,12 @@ const latestProjects = projects.slice(0, 3);
 
 const { Content: AboutContent } = await (aboutContent?.render() ?? { Content: () => null });
 const { Content: ContactContent } = await (contactContent?.render() ?? { Content: () => null });
+
+// Prepare skills data
+const skillsData = {
+    technical: skillsContent?.data.technical ?? [],
+    soft: skillsContent?.data.softSkills ?? []
+};
 ---
 
 <MainLayout title="Meet Joshi - Portfolio" description="Welcome to my portfolio website">
@@ -34,30 +42,20 @@ const { Content: ContactContent } = await (contactContent?.render() ?? { Content
                 <h2 class="text-4xl font-bold mb-4">{aboutContent?.data?.title ?? 'About Me'}</h2>
                 <div class="divider divider-primary w-24 mx-auto"></div>
             </div>
-            <div class="grid md:grid-cols-5 gap-8">
-                <div class="md:col-span-3">
-                    <div class="prose prose-lg max-w-none">
-                        <AboutContent />
-                    </div>
-                </div>
-                <div class="md:col-span-2">
-                    <div class="card bg-base-200 shadow-xl">
-                        <div class="card-body">
-                            <h3 class="card-title text-primary flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                </svg>
-                                Skills & Technologies
-                            </h3>
-                            <div class="flex flex-wrap gap-2 mt-4">
-                                {['HTML5', 'CSS3', 'JavaScript', 'React', 'Astro', 'Node.js', 'Express', 'SQL', 'APIs'].map((skill) => (
-                                    <div class="badge badge-primary badge-lg">{skill}</div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="prose prose-lg max-w-none">
+                <AboutContent />
             </div>
+        </div>
+    </section>
+
+    <section id="skills" class="py-20 bg-base-200">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">{skillsContent?.data?.title}</h2>
+                <p class="text-xl opacity-75">{skillsContent?.data?.subtitle}</p>
+                <div class="divider divider-primary w-24 mx-auto mt-8"></div>
+            </div>
+            <Skills skills={skillsData} />
         </div>
     </section>
 

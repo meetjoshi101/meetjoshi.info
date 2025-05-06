@@ -1,0 +1,46 @@
+---
+interface Skill {
+  title: string;
+  items: string[];
+  color: string;
+}
+
+interface Props {
+  skills: {
+    technical: Skill[];
+    soft: string[];
+  };
+}
+
+const { skills } = Astro.props;
+---
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {
+    skills.technical.map((category) => (
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h3 class={`card-title text-${category.color}`}>{category.title}</h3>
+          <div class="flex flex-wrap gap-2">
+            {category.items.map((skill) => (
+              <span class={`badge badge-${category.color}`}>{skill}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<div class="card bg-base-100 shadow-xl mt-8">
+  <div class="card-body">
+    <h3 class="card-title text-accent">Soft Skills</h3>
+    <div class="flex flex-wrap gap-3">
+      {
+        skills.soft.map((skill) => (
+          <span class="badge badge-accent badge-lg">{skill}</span>
+        ))
+      }
+    </div>
+  </div>
+</div>
