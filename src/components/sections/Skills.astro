@@ -15,18 +15,18 @@ interface Props {
 const { skills } = Astro.props;
 ---
 
-<section class="py-12">
-  <h2 class="section-title">Technical Skills</h2>
+<section class="py-12" id="skills-section" data-scroll-progress>
+  <h2 class="section-title scroll-up ease-bounce speed-fast" data-once="true">Technical Skills</h2>
   
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-sequence data-base-delay="50" data-increment="100">
     {
-      skills.technical.map((category) => (
-        <div class="card bg-base-200">
+      skills.technical.map((category, index) => (
+        <div class="card bg-base-200 hover-lift scroll-up speed-fast" data-once="true">
           <div class="card-body">
             <h3 class={`text-lg font-medium text-${category.color}`}>{category.title}</h3>
-            <div class="flex flex-wrap gap-2 mt-2">
+            <div class="flex flex-wrap gap-2 mt-2" data-sequence data-base-delay="0" data-increment="30">
               {category.items.map((skill) => (
-                <span class={`badge badge-${category.color}`}>{skill}</span>
+                <span class={`badge badge-${category.color} scroll-scale speed-fast`} data-once="true">{skill}</span>
               ))}
             </div>
           </div>
@@ -35,14 +35,14 @@ const { skills } = Astro.props;
     }
   </div>
 
-  <div class="mt-10">
-    <h2 class="section-title">Soft Skills</h2>
-    <div class="card bg-base-200">
+  <div class="mt-10" data-sequence data-base-delay="200" data-increment="100">
+    <h2 class="section-title scroll-up ease-bounce speed-fast" data-once="true">Soft Skills</h2>
+    <div class="card bg-base-200 hover-lift scroll-fade ease-smooth speed-fast" data-once="true">
       <div class="card-body">
-        <div class="flex flex-wrap gap-3">
+        <div class="flex flex-wrap gap-3" data-sequence data-base-delay="30" data-increment="40">
           {
             skills.soft.map((skill) => (
-              <span class="badge badge-accent">{skill}</span>
+              <span class="badge badge-accent scroll-scale speed-fast" data-once="true">{skill}</span>
             ))
           }
         </div>
@@ -50,3 +50,31 @@ const { skills } = Astro.props;
     </div>
   </div>
 </section>
+
+<script>
+  // Initialize skills section animation when it enters viewport
+  document.addEventListener('DOMContentLoaded', () => {
+    const skillsSection = document.getElementById('skills-section');
+    if (!skillsSection) return;
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Trigger all animations in the skills section at once
+          const animatedElements = skillsSection.querySelectorAll('.scroll-up, .scroll-fade, .scroll-scale');
+          requestAnimationFrame(() => {
+            animatedElements.forEach(el => {
+              el.classList.add('visible');
+            });
+          });
+          observer.unobserve(skillsSection);
+        }
+      });
+    }, {
+      threshold: 0.1, // Start animation when 10% of the section is visible
+      rootMargin: '0px 0px -10% 0px'
+    });
+    
+    observer.observe(skillsSection);
+  });
+</script>
