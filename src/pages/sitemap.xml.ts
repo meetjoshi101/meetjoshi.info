@@ -36,13 +36,13 @@ export const GET: APIRoute = async ({ site }) => {
       priority: priorityMap['/'] || '0.5',
     },
     {
-      url: `${baseUrl}projects`,
+      url: `${baseUrl.replace(/\/?$/, '/')}${'projects'}`,
       lastmod: now,
       changefreq: 'weekly',
       priority: priorityMap['/projects'] || '0.5',
     },
     {
-      url: `${baseUrl}blogs`,
+      url: `${baseUrl.replace(/\/?$/, '/')}/blogs`,
       lastmod: now,
       changefreq: 'weekly',
       priority: priorityMap['/blogs'] || '0.5',
@@ -51,7 +51,7 @@ export const GET: APIRoute = async ({ site }) => {
 
   // Build project pages
   const projectPages = projects.map((project) => {
-    const url = `${baseUrl}projects/${project.slug}`;
+    const url = `${baseUrl.replace(/\/?$/, '/')}${'projects/'}${project.slug}`;
     const lastmod = project.data.publishDate ? formatDate(project.data.publishDate) : now;
     return {
       url,
@@ -63,7 +63,7 @@ export const GET: APIRoute = async ({ site }) => {
 
   // Build blog pages
   const blogPages = blogs.map((blog) => {
-    const url = `${baseUrl}blogs/${blog.slug}`;
+    const url = `${baseUrl.replace(/\/?$/, '/')}${'blogs/'}${blog.slug}`;
     const lastmod = blog.data.publishDate ? formatDate(blog.data.publishDate) : now;
     return {
       url,
