@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @plugin "daisyui";
+
 @plugin "daisyui/theme" {
   name: "anothertown";
   default: true;
@@ -39,20 +40,25 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  
+  body {
+    @apply bg-base-100 text-base-content;
   }
 }
 
 @layer components {
   .prose h2 {
-    @apply text-2xl font-bold mt-8 mb-4;
+    @apply text-2xl font-bold mt-8 mb-4 text-base-content;
   }
 
   .prose h3 {
-    @apply text-xl font-semibold mt-6 mb-3;
+    @apply text-xl font-semibold mt-6 mb-3 text-base-content;
   }
 
   .prose p {
-    @apply leading-relaxed mb-4;
+    @apply leading-relaxed mb-4 text-base-content;
   }
 
   .prose ul {
@@ -85,18 +91,37 @@
   }
 
   @media (min-width: 640px) {
-      .contact-links ul li {
-        @apply flex items-center justify-between;
-      }
-  
-      .contact-links ul li::before {
-        @apply hidden;
-      }
+    .contact-links ul li {
+      @apply flex items-center justify-between;
     }
+  
+    .contact-links ul li::before {
+      @apply hidden;
+    }
+  }
+
+  /* Additional utility classes */
+  .container-custom {
+    @apply px-4 mx-auto max-w-5xl;
+  }
+
+  .section-title {
+    @apply text-2xl font-bold mb-6 text-base-content;
+  }
 }
 
 @layer utilities {
   .section-divider {
     @apply divider divider-primary w-24 mx-auto;
+  }
+
+  /* Card utilities for minimalist design */
+  .card-border {
+    @apply border border-base-200;
+  }
+
+  /* Background variants */
+  .bg-gradient-subtle {
+    @apply bg-gradient-to-br from-base-200/50 to-transparent;
   }
 }
