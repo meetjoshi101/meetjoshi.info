@@ -1,0 +1,156 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  article?: boolean;
+  canonicalURL?: string;
+  keywords?: string;
+  type?: 'website' | 'portfolio' | 'article' | 'profile';
+  publishedDate?: Date;
+  modifiedDate?: Date;
+  author?: string;
+  section?: string;
+}
+
+const {
+  title,
+  description,
+  image = '/favicon.svg', // Default image if none provided
+  article = false,
+  canonicalURL = Astro.url.href,
+  keywords = "web developer, software developer, frontend developer, full stack developer, React developer, JavaScript developer",
+  type = "website",
+  publishedDate,
+  modifiedDate,
+  author = "Meet Joshi",
+  section = "Portfolio",
+} = Astro.props;
+
+const siteURL = Astro.url.origin;
+const ogImageURL = image.startsWith('http') ? image : `${siteURL}${image}`;
+const siteName = "Meet Joshi - Software Developer";
+
+// JSON-LD structured data
+let structuredData;
+
+if (type === 'profile') {
+  structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Meet Joshi",
+    "url": siteURL,
+    "jobTitle": "Software Developer",
+    "knowsAbout": ["Web Development", "Frontend Development", "JavaScript", "React", "Node.js", "Astro"],
+    "description": description,
+    "image": ogImageURL,
+    "sameAs": [
+      "https://github.com/meetjoshi101",
+      "https://linkedin.com/in/yourusername" // Update with your actual LinkedIn URL
+    ]
+  };
+} else if (type === 'article') {
+  structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": title,
+    "image": ogImageURL,
+    "author": {
+      "@type": "Person",
+      "name": author,
+      "url": siteURL
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Meet Joshi",
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${siteURL}/favicon.svg`
+      }
+    },
+    "datePublished": publishedDate ? publishedDate.toISOString() : new Date().toISOString(),
+    "dateModified": modifiedDate ? modifiedDate.toISOString() : new Date().toISOString(),
+    "description": description,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": canonicalURL
+    }
+  };
+} else if (type === 'portfolio') {
+  structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": siteName,
+    "url": siteURL,
+    "description": description,
+    "author": {
+      "@type": "Person",
+      "name": "Meet Joshi",
+      "jobTitle": "Software Developer & Web Developer"
+    },
+    "keywords": keywords,
+    "creator": {
+      "@type": "Person",
+      "name": "Meet Joshi"
+    }
+  };
+} else {
+  structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": siteName,
+    "url": siteURL,
+    "description": description,
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": `${siteURL}?q={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
+  };
+}
+---
+
+<!-- Primary Meta Tags -->
+<title>{title}</title>
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+<meta name="keywords" content={keywords} />
+<meta name="author" content="Meet Joshi" />
+
+<!-- Canonical Link -->
+<link rel="canonical" href={canonicalURL} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={article ? 'article' : 'website'} />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImageURL} />
+<meta property="og:site_name" content={siteName} />
+{publishedDate && <meta property="article:published_time" content={publishedDate.toISOString()} />}
+{modifiedDate && <meta property="article:modified_time" content={modifiedDate.toISOString()} />}
+{section && <meta property="article:section" content={section} />}
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={canonicalURL} />
+<meta property="twitter:title" content={title} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={ogImageURL} />
+<meta property="twitter:creator" content="@meetjoshi" /> <!-- Update with your Twitter handle if you have one -->
+
+<!-- Additional SEO tags -->
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+<meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="application-name" content="Meet Joshi - Portfolio" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Meet Joshi" />
+
+<!-- Structured Data -->
+<script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+<!-- Preconnect to required origins -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

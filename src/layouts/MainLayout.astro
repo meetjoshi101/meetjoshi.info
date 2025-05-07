@@ -1,13 +1,35 @@
 ---
 import '../styles/global.css';
 import Navbar from '../components/layout/Navbar.astro';
+import SEO from '../components/common/SEO.astro';
 
 interface Props {
     title: string;
     description?: string;
+    image?: string;
+    article?: boolean;
+    canonicalURL?: string;
+    keywords?: string;
+    type?: 'website' | 'portfolio' | 'article' | 'profile';
+    publishedDate?: Date;
+    modifiedDate?: Date;
+    author?: string;
+    section?: string;
 }
 
-const { title, description = "My Portfolio Website" } = Astro.props;
+const { 
+    title, 
+    description = "Meet Joshi's Portfolio - Web Developer & Designer", 
+    image,
+    article,
+    canonicalURL,
+    keywords,
+    type,
+    publishedDate,
+    modifiedDate,
+    author,
+    section
+} = Astro.props;
 ---
 
 <html lang="en" data-theme="anothertown">
@@ -15,9 +37,22 @@ const { title, description = "My Portfolio Website" } = Astro.props;
         <meta charset="utf-8" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="viewport" content="width=device-width" />
-        <meta name="description" content={description} />
         <meta name="generator" content={Astro.generator} />
-        <title>{title}</title>
+        
+        <SEO
+            title={title}
+            description={description}
+            image={image}
+            article={article}
+            canonicalURL={canonicalURL}
+            keywords={keywords}
+            type={type}
+            publishedDate={publishedDate}
+            modifiedDate={modifiedDate}
+            author={author}
+            section={section}
+        />
+        
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">

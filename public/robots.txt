@@ -1,0 +1,10 @@
+# robots.txt for meetjoshi.info
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://meetjoshi.info/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10
