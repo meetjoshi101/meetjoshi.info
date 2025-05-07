@@ -1,6 +1,6 @@
 ---
 section: "hero"
-title: "Hello, I'm Meet Joshi"
+title: "Hello👋, I'm Meet Joshi"
 subtitle: "Looking for Software Developer ?"
 displayOrder: 1
 ---
