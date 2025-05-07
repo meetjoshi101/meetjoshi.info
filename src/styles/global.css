@@ -41,6 +41,8 @@
   html {
     scroll-behavior: smooth;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    /* Add RGB variables for animation usage */
+    --color-primary-rgb: 144, 182, 220; /* Approximate RGB for primary color */
   }
   
   body {
@@ -123,5 +125,307 @@
   /* Background variants */
   .bg-gradient-subtle {
     @apply bg-gradient-to-br from-base-200/50 to-transparent;
+  }
+
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+    animation-fill-mode: both;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+  }
+  
+  .animate-slide-in-right {
+    animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+  }
+  
+  .animate-scale {
+    animation: scale 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 5s ease-in-out infinite;
+  }
+  
+  .hover-lift {
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-5 { animation-delay: 0.5s; }
+  
+  /* Keyframes for animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes scale {
+    0% {
+      transform: scale(0.85);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+
+  /* Scroll animation utilities */
+  .scroll-animate {
+    opacity: 0;
+    transition-property: opacity, transform;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    transition-duration: 0.8s;
+    will-change: opacity, transform;
+  }
+  
+  .scroll-animate.visible {
+    opacity: 1;
+  }
+  
+  /* Scroll animation variations with improved timing functions */
+  .scroll-fade {
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity;
+  }
+  
+  .scroll-fade.visible {
+    opacity: 1;
+  }
+  
+  .scroll-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform, opacity;
+  }
+  
+  .scroll-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Scroll animation with intensity variations */
+  /* Subtle animations (smaller movement) */
+  .scroll-up[data-intensity="subtle"] {
+    opacity: 0;
+    transform: translateY(15px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform, opacity;
+  }
+  
+  .scroll-up[data-intensity="subtle"].visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Dramatic animations (larger movement) */
+  .scroll-up[data-intensity="dramatic"] {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform, opacity;
+  }
+  
+  .scroll-up[data-intensity="dramatic"].visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .scroll-down {
+    opacity: 0;
+    transform: translateY(-30px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform, opacity;
+  }
+  
+  .scroll-down.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .scroll-left {
+    opacity: 0;
+    transform: translateX(30px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform, opacity;
+  }
+  
+  .scroll-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .scroll-right {
+    opacity: 0;
+    transform: translateX(-30px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform, opacity;
+  }
+  
+  .scroll-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .scroll-scale {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform, opacity;
+  }
+  
+  .scroll-scale.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  /* Scroll Progress Animations */
+  .scroll-progress-fade {
+    opacity: calc(var(--scroll-progress, 0) * 1);
+    transition: opacity 0.2s ease-out;
+  }
+  
+  .scroll-progress-scale {
+    transform: scale(calc(0.85 + (var(--scroll-progress, 0) * 0.15)));
+    transition: transform 0.2s ease-out;
+    will-change: transform;
+  }
+  
+  .scroll-progress-rotate {
+    transform: rotate(calc(var(--scroll-progress, 0) * 360deg));
+    transition: transform 0.2s ease-out;
+    will-change: transform;
+  }
+  
+  .scroll-progress-slide-x {
+    transform: translateX(calc((1 - var(--scroll-progress, 0)) * 50px));
+    transition: transform 0.2s ease-out;
+    will-change: transform;
+  }
+  
+  .scroll-progress-slide-y {
+    transform: translateY(calc((1 - var(--scroll-progress, 0)) * 50px));
+    transition: transform 0.2s ease-out;
+    will-change: transform;
+  }
+  
+  /* Animation easing options */
+  .ease-bounce {
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  }
+  
+  .ease-smooth {
+    transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1) !important;
+  }
+
+  .ease-out-expo {
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  
+  /* Animation speed options */
+  .speed-fast { transition-duration: 0.6s !important; }
+  .speed-normal { transition-duration: 0.8s !important; }
+  .speed-slow { transition-duration: 1.2s !important; }
+  
+  /* Delay utilities for scroll animations */
+  .delay-100 { transition-delay: 100ms; }
+  .delay-200 { transition-delay: 200ms; }
+  .delay-300 { transition-delay: 300ms; }
+  .delay-400 { transition-delay: 400ms; }
+  .delay-500 { transition-delay: 500ms; }
+  .delay-600 { transition-delay: 600ms; }
+  .delay-700 { transition-delay: 700ms; }
+  .delay-800 { transition-delay: 800ms; }
+  .delay-900 { transition-delay: 900ms; }
+  .delay-1000 { transition-delay: 1000ms; }
+  
+  /* Reduce motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-animate,
+    .scroll-fade,
+    .scroll-up,
+    .scroll-down,
+    .scroll-left,
+    .scroll-right,
+    .scroll-scale,
+    .scroll-progress-fade,
+    .scroll-progress-scale,
+    .scroll-progress-rotate,
+    .scroll-progress-slide-x,
+    .scroll-progress-slide-y {
+      transition: none !important;
+      transform: none !important;
+      opacity: 1 !important;
+    }
+  }
+  
+  body.reduce-motion {
+    .scroll-animate,
+    .scroll-fade,
+    .scroll-up,
+    .scroll-down,
+    .scroll-left,
+    .scroll-right,
+    .scroll-scale {
+      transition-duration: 0.15s;
+      transform: translateY(0);
+    }
   }
 }
