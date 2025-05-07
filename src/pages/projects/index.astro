@@ -4,9 +4,18 @@ import MainLayout from '../../layouts/MainLayout.astro';
 
 const projects: CollectionEntry<'projects'>[] = await getCollection('projects');
 projects.sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+
+// SEO optimization
+const pageTitle = "Projects Portfolio | Meet Joshi";
+const pageDescription = "Explore my web development projects showcasing skills in modern front-end and back-end technologies.";
+const pageImage = projects.length > 0 && projects[0].data.image ? projects[0].data.image : "/favicon.svg";
 ---
 
-<MainLayout title="My Projects">
+<MainLayout 
+    title={pageTitle}
+    description={pageDescription}
+    image={pageImage}
+>
     <div class="py-20">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
