@@ -1,15 +1,10 @@
 ---
 section: "hero"
-title: "👋 Hi there!"
-subtitle: " I'm Meet Joshi"
+title: "Hello👋, I'm Meet Joshi"
+subtitle: "Looking for Software Developer ?"
 displayOrder: 1
 ---
+**Who can understand your business, and get things done?**<br/>
+**You're in the right place.**<br/>
 
-Looking for a developer who can jump in,
-understand your business, <br>
-and get things done?
-
-You’re in the right place.
-
-I’m a software developer with 3+ years of experience building scalable, production-grade apps using Angular, Node.js, and SQL.
-Tech is never a limitation — I adapt fast, learn what’s needed, and focus on solving real business problems.
+I combine technical expertise with business understanding to deliver solutions that make an impact.
