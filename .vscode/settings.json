@@ -10,6 +10,11 @@
         "type": "stdio",
         "command": "npx",
         "args": ["-y", "@upstash/context7-mcp@latest"]
+      },
+      "Git": {
+        "type": "stdio",
+        "command": "npx",
+        "args": ["-y", "@cyanheads/git-mcp-server@latest"]
       }
     }
   }
