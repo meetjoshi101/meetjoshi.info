@@ -1,0 +1,98 @@
+---
+import { getSessionFromCookie } from '../lib/auth/session';
+import Sidebar from '../components/admin/Sidebar.astro';
+
+let session = getSessionFromCookie(Astro.request);
+// If not authenticated, redirect to login page
+if (!session || !isLoggedIn(session)) {
+  return Astro.redirect('/admin/login');
+}
+
+// Get the current active page to highlight in sidebar
+const pathname = Astro.url.pathname;
+let activeItem = 'dashboard';
+
+if (pathname.includes('/admin/blogs')) {
+  activeItem = 'blogs';
+} else if (pathname.includes('/admin/projects')) {
+  activeItem = 'projects';
+} else if (pathname.includes('/admin/site-content')) {
+  activeItem = 'site-content';
+}
+
+interface Props {
+  title?: string;
+}
+
+const { title } = Astro.props; //t for all admin pages
+
+import { isLoggedIn } from '../lib/auth/auth';
+
+session = getSessionFromCookie(Astro.request);
+const isAuthenticated = session && isLoggedIn(session);
+
+// If not authenticated, redirect to login
+if (!session || !isLoggedIn(session)) {
+  return Astro.redirect('/admin/login');
+}
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title || 'Admin Dashboard'}</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="bg-base-200 min-h-screen">
+    <div class="drawer lg:drawer-open">
+      <input id="drawer-toggle" type="checkbox" class="drawer-toggle" />
+      
+      <div class="drawer-content flex flex-col">
+        <!-- Top navigation bar -->
+        <div class="navbar bg-base-100 shadow-sm mb-4 sticky top-0 z-10">
+          <div class="flex-none lg:hidden">
+            <label for="drawer-toggle" class="btn btn-square btn-ghost">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </label>
+          </div>
+          <div class="flex-1 px-4">
+            <h1 class="text-xl font-semibold">Admin Dashboard</h1>
+          </div>
+          <div class="flex-none">
+            <div class="dropdown dropdown-end">
+              <div tabindex="0" role="button" class="btn btn-ghost">
+                <span>{session?.username}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow bg-base-100 rounded-box w-52 mt-4">
+                <li><a href="/" target="_blank">View Site</a></li>
+                <li><button id="logout-button">Logout</button></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Main content -->
+        <div class="p-5">
+          <slot />
+        </div>
+      </div>
+      
+      <!-- Sidebar -->
+      <div class="drawer-side z-20">
+        <label for="drawer-toggle" aria-label="close sidebar" class="drawer-overlay"></label>
+        <Sidebar activeItem={activeItem} />
+      </div>
+    </div>
+    
+    <script>
+      // No logout functionality here - moved to Sidebar component
+    </script>
+  </body>
+</html>

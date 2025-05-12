@@ -1,0 +1,360 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import ContentEditor from '../../../components/admin/ContentEditor.astro';
+
+const title = "Site Content Management | Admin";
+
+// Content sections available for editing
+const contentSections = [
+  { id: 'hero', title: 'Hero Section', description: 'Main landing section content' },
+  { id: 'about', title: 'About Section', description: 'Information about Meet Joshi' },
+  { id: 'skills', title: 'Skills Section', description: 'Technical skills and proficiencies' },
+  { id: 'contact', title: 'Contact Section', description: 'Contact information and form' },
+];
+
+// Get the section parameter or default to 'hero'
+const { section = 'hero' } = Astro.params;
+const activeSection = contentSections.find(s => s.id === section) || contentSections[0];
+
+// We would normally fetch content data here
+// For now we'll use placeholders assuming API endpoints will be created
+let contentData = {
+  title: "",
+  content: "",
+  metadata: {}
+};
+
+// In a real implementation, we would get the content from a database or file system
+try {
+  // This is placeholder data for demonstration
+  switch (activeSection.id) {
+    case 'hero':
+      contentData = {
+        title: "Hi, I'm Meet Joshi",
+        content: "# Hi, I'm Meet Joshi\n\nA passionate web developer focused on building modern and efficient web applications.",
+        metadata: {
+          subtitle: "Web Developer & Designer",
+          ctaText: "View My Work",
+          ctaUrl: "#projects"
+        }
+      };
+      break;
+    case 'about':
+      contentData = {
+        title: "About Me",
+        content: "# About Me\n\nI'm a web developer with expertise in modern JavaScript frameworks and libraries. I love creating clean, efficient, and user-friendly websites.",
+        metadata: {
+          image: "/about.jpg"
+        }
+      };
+      break;
+    case 'skills':
+      contentData = {
+        title: "Skills & Expertise",
+        content: "# Skills & Expertise\n\nHere are some of the technologies I work with regularly.",
+        metadata: {
+          skillGroups: [
+            {
+              title: "Frontend",
+              skills: ["JavaScript", "React", "Vue", "HTML/CSS"]
+            },
+            {
+              title: "Backend",
+              skills: ["Node.js", "Express", "MongoDB", "PostgreSQL"]
+            }
+          ]
+        }
+      };
+      break;
+    case 'contact':
+      contentData = {
+        title: "Let's Connect",
+        content: "# Let's Connect\n\nHave a project in mind? Reach out to me using the contact form below or through my social media profiles.",
+        metadata: {
+          email: "meet@example.com",
+          phone: "+1234567890",
+          linkedIn: "https://linkedin.com/in/meetjoshi"
+        }
+      };
+      break;
+  }
+} catch (error) {
+  console.error("Error fetching content data:", error);
+}
+---
+
+<AdminLayout title={title}>
+  <div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">Site Content Management</h1>
+    </div>
+    
+    <div class="flex flex-col md:flex-row gap-6">
+      <!-- Sidebar navigation -->
+      <div class="w-full md:w-64 mb-6 md:mb-0">
+        <div class="card bg-base-100 shadow-md">
+          <div class="card-body p-4">
+            <h3 class="font-bold mb-4">Content Sections</h3>
+            <ul class="menu bg-base-100 gap-2">
+              {contentSections.map(item => (
+                <li>
+                  <a 
+                    href={`/admin/site-content/${item.id}`} 
+                    class={item.id === activeSection.id ? 'active' : ''}
+                  >
+                    {item.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Content editor -->
+      <div class="flex-grow">
+        <div class="card bg-base-100 shadow-md">
+          <div class="card-body">
+            <h2 class="card-title mb-2">Edit {activeSection.title}</h2>
+            <p class="opacity-70 mb-6">{activeSection.description}</p>
+            
+            <form id="content-form" class="space-y-6">
+              <div class="alert alert-error hidden" id="error-message">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="error-text">Error message</span>
+              </div>
+              
+              <input type="hidden" name="section" value={activeSection.id} />
+              
+              <div>
+                <label for="title" class="label">Section Title</label>
+                <input 
+                  type="text" 
+                  id="title" 
+                  name="title" 
+                  placeholder="Section title" 
+                  required
+                  class="input input-bordered w-full"
+                  value={contentData.title}
+                />
+              </div>
+              
+              <div>
+                <label for="content" class="label">Content (Markdown)</label>
+                <ContentEditor content={contentData.content} id="content" minHeight="300px" />
+              </div>
+              
+              <!-- Dynamic metadata fields based on section -->
+              <div class="card bg-base-200">
+                <div class="card-body p-4">
+                  <h3 class="text-lg font-medium mb-4">Additional Settings</h3>
+                  
+                  {activeSection.id === 'hero' && (
+                    <div class="space-y-4">
+                      <div>
+                        <label for="subtitle" class="label">Subtitle</label>
+                        <input 
+                          type="text" 
+                          id="subtitle" 
+                          name="metadata.subtitle" 
+                          placeholder="Subtitle text"
+                          class="input input-bordered w-full"
+                          value={contentData.metadata.subtitle}
+                        />
+                      </div>
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label for="ctaText" class="label">CTA Button Text</label>
+                          <input 
+                            type="text" 
+                            id="ctaText" 
+                            name="metadata.ctaText" 
+                            placeholder="Call to action text"
+                            class="input input-bordered w-full"
+                            value={contentData.metadata.ctaText}
+                          />
+                        </div>
+                        <div>
+                          <label for="ctaUrl" class="label">CTA Button URL</label>
+                          <input 
+                            type="text" 
+                            id="ctaUrl" 
+                            name="metadata.ctaUrl" 
+                            placeholder="#section or /page"
+                            class="input input-bordered w-full"
+                            value={contentData.metadata.ctaUrl}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {activeSection.id === 'about' && (
+                    <div>
+                      <label for="aboutImage" class="label">About Image URL</label>
+                      <input 
+                        type="url" 
+                        id="aboutImage" 
+                        name="metadata.image" 
+                        placeholder="https://example.com/image.jpg"
+                        class="input input-bordered w-full"
+                        value={contentData.metadata.image}
+                      />
+                    </div>
+                  )}
+                  
+                  {activeSection.id === 'contact' && (
+                    <div class="space-y-4">
+                      <div>
+                        <label for="email" class="label">Email Address</label>
+                        <input 
+                          type="email" 
+                          id="email" 
+                          name="metadata.email" 
+                          placeholder="your@email.com"
+                          class="input input-bordered w-full"
+                          value={contentData.metadata.email}
+                        />
+                      </div>
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label for="phone" class="label">Phone Number</label>
+                          <input 
+                            type="tel" 
+                            id="phone" 
+                            name="metadata.phone" 
+                            placeholder="+1234567890"
+                            class="input input-bordered w-full"
+                            value={contentData.metadata.phone}
+                          />
+                        </div>
+                        <div>
+                          <label for="linkedIn" class="label">LinkedIn URL</label>
+                          <input 
+                            type="url" 
+                            id="linkedIn" 
+                            name="metadata.linkedIn" 
+                            placeholder="https://linkedin.com/in/username"
+                            class="input input-bordered w-full"
+                            value={contentData.metadata.linkedIn}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Note: Skills section would need a more complex UI with dynamic fields */}
+                  {activeSection.id === 'skills' && (
+                    <div class="alert alert-info">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span>Skill groups can be managed through the API or JSON file directly. This UI provides basic content editing.</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div class="card-actions justify-end">
+                <button type="submit" class="btn btn-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                  </svg>
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const contentForm = document.getElementById('content-form');
+    const errorMessage = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+    
+    // Form submission
+    contentForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (errorMessage) {
+        errorMessage.classList.add('hidden');
+      }
+      
+      try {
+        // Get form data
+        const formData = new FormData(e.target as HTMLFormElement);
+        const contentTextarea = document.getElementById('content');
+        const section = formData.get('section');
+        
+        if (contentTextarea instanceof HTMLTextAreaElement) {
+          formData.append('content', contentTextarea.value);
+        }
+        
+        // Process metadata fields
+        const metadataFields = {};
+        const toDelete = [];
+        
+        formData.forEach((value, key) => {
+          if (key.startsWith('metadata.')) {
+            const metaKey = key.replace('metadata.', '');
+            metadataFields[metaKey] = value;
+            toDelete.push(key);
+          }
+        });
+        
+        // Remove the processed metadata fields
+        toDelete.forEach(key => formData.delete(key));
+        
+        // Add the metadata object
+        formData.append('metadata', JSON.stringify(metadataFields));
+        
+        // Convert FormData to regular object
+        const contentData = Object.fromEntries(formData.entries());
+        
+        // Send API request
+        const response = await fetch(`/api/site-content/${section}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(contentData),
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Show success message
+          alert('Content updated successfully');
+          
+          // Reload the page to show updated content
+          window.location.reload();
+        } else {
+          // Show error message
+          if (errorText) {
+            errorText.textContent = data.message || 'Error updating content';
+          }
+          
+          if (errorMessage) {
+            errorMessage.classList.remove('hidden');
+          }
+        }
+      } catch (error) {
+        console.error('Error updating content:', error);
+        if (errorText) {
+          errorText.textContent = 'An unexpected error occurred';
+        }
+        
+        if (errorMessage) {
+          errorMessage.classList.remove('hidden');
+        }
+      }
+    });
+  });
+</script>

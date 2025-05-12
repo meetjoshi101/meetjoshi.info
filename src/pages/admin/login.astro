@@ -1,0 +1,172 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { getSessionFromCookie } from '../../lib/auth/session';
+import { isLoggedIn } from '../../lib/auth/auth';
+
+// Check if user is already logged in
+const session = getSessionFromCookie(Astro.request);
+if (session && isLoggedIn(session)) {
+  // Already logged in, redirect to admin dashboard
+  return Astro.redirect('/admin');
+}
+
+const pageTitle = "Admin Login | Meet Joshi";
+---
+
+<MainLayout title={pageTitle} description="Admin login page" image="/favicon.svg">
+  <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-base-200/30">
+    <div class="max-w-md w-full space-y-8 card bg-base-100 shadow-lg">
+      <div class="card-body">
+        <div class="text-center">
+          <h1 class="card-title text-2xl font-bold justify-center mb-6">Admin Login</h1>
+        </div>
+        
+        <form id="login-form" class="space-y-6">
+          <div class="alert alert-error hidden" id="error-message">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span id="error-text">Invalid credentials</span>
+          </div>
+          
+          <div>
+            <label for="username" class="label">Username</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              required
+              class="input input-bordered w-full"
+              placeholder="Username"
+            />
+          </div>
+          
+          <div>
+            <label for="password" class="label">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              class="input input-bordered w-full"
+              placeholder="Password"
+            />
+          </div>
+          
+          <div>
+            <button
+              type="submit"
+              class="btn btn-primary w-full"
+              id="login-button"
+            >
+              <span id="button-text">Sign in</span>
+              <span id="button-loading" class="loading loading-spinner loading-sm hidden"></span>
+            </button>
+          </div>
+        </form>
+        
+        <div class="text-center mt-4">
+          <a href="/" class="link link-hover text-sm">Return to home</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('login-form');
+    const errorMessage = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+    const buttonText = document.getElementById('button-text');
+    const buttonLoading = document.getElementById('button-loading');
+    const loginButton = document.getElementById('login-button');
+    
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Hide any previous errors
+      if (errorMessage) {
+        errorMessage.classList.add('hidden');
+      }
+      
+      // Show loading state
+      if (buttonText) {
+        buttonText.classList.add('hidden');
+      }
+      
+      if (buttonLoading) {
+        buttonLoading.classList.remove('hidden');
+      }
+      
+      if (loginButton instanceof HTMLButtonElement) {
+        loginButton.disabled = true;
+      }
+      
+      // Get form values
+      const usernameInput = document.getElementById('username');
+      const passwordInput = document.getElementById('password');
+      
+      if (!usernameInput || !(usernameInput instanceof HTMLInputElement) || 
+          !passwordInput || !(passwordInput instanceof HTMLInputElement)) {
+        console.error('Required form inputs not found');
+        return;
+      }
+      
+      const username = usernameInput.value;
+      const password = passwordInput.value;
+      
+      try {
+        // Send login request
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          // Redirect to dashboard on success
+          window.location.href = data.redirectTo || '/admin';
+        } else {
+          // Show error message
+          if (errorText) {
+            errorText.textContent = data.message || 'Login failed';
+          }
+          
+          if (errorMessage) {
+            errorMessage.classList.remove('hidden');
+          }
+          
+          // Reset form
+          passwordInput.value = '';
+        }
+      } catch (error) {
+        // Show generic error message
+        if (errorText) {
+          errorText.textContent = 'An error occurred. Please try again.';
+        }
+        
+        if (errorMessage) {
+          errorMessage.classList.remove('hidden');
+        }
+        
+        console.error('Login error:', error);
+      } finally {
+        // Reset button state
+        if (buttonText) {
+          buttonText.classList.remove('hidden');
+        }
+        
+        if (buttonLoading) {
+          buttonLoading.classList.add('hidden');
+        }
+        
+        if (loginButton instanceof HTMLButtonElement) {
+          loginButton.disabled = false;
+        }
+      }
+    });
+  });
+</script>

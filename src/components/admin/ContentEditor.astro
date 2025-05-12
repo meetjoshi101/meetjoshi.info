@@ -1,0 +1,150 @@
+---
+// ContentEditor component for blog posts and project editing
+// Uses Markdown for content editing
+
+interface Props {
+  content: string;
+  id?: string;
+  placeholder?: string;
+  minHeight?: string;
+  previewEnabled?: boolean;
+}
+
+const {
+  content = '',
+  id = 'content-editor',
+  placeholder = 'Write your content here...',
+  minHeight = '300px',
+  previewEnabled = true
+} = Astro.props;
+---
+
+<div class="content-editor-container w-full">
+  <div class="tabs tabs-border mb-4" id={`tabs-${id}`}>
+    <button type="button" class="tab tab-active" data-tab="write">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+      </svg>
+      Write
+    </button>
+    {previewEnabled && (
+      <button type="button" class="tab" data-tab="preview">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        Preview
+      </button>
+    )}
+  </div>
+  
+  <div class="tab-content">
+    <div id={`write-${id}`} class="tab-pane active">
+      <textarea 
+        id={id} 
+        name={id} 
+        class="textarea textarea-bordered w-full font-mono" 
+        placeholder={placeholder}
+        style={`min-height: ${minHeight};`}
+      >{content}</textarea>
+    </div>
+    
+    {previewEnabled && (
+      <div id={`preview-${id}`} class="tab-pane hidden">
+        <div class="preview-container bg-base-100 border border-base-300 rounded-md p-4 overflow-y-auto prose max-w-none" style={`min-height: ${minHeight};`}>
+          <div class="markdown-preview"></div>
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+
+<script define:vars={{ id, previewEnabled }}>
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabsContainer = document.getElementById(`tabs-${id}`);
+    const writePane = document.getElementById(`write-${id}`);
+    const previewPane = document.getElementById(`preview-${id}`);
+    const textarea = document.getElementById(id);
+    const previewContainer = previewPane?.querySelector('.markdown-preview');
+    
+    // Function to render markdown preview
+    const renderPreview = async () => {
+      if (!previewEnabled || !previewContainer || !textarea) return;
+      
+      try {
+        // If marked library is loaded
+        if (window.marked) {
+          previewContainer.innerHTML = window.marked.parse(textarea.value);
+        } else {
+          // Simple fallback if marked is not available
+          previewContainer.innerHTML = `<pre>${textarea.value}</pre>`;
+          console.warn('Marked library not loaded. Using plain text preview instead.');
+        }
+      } catch (error) {
+        console.error('Error rendering markdown preview:', error);
+        previewContainer.innerHTML = '<p class="text-error">Error rendering preview</p>';
+      }
+    };
+    
+    // Set up tab switching
+    tabsContainer?.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.getAttribute('data-tab');
+        
+        // Update active tab styling
+        tabsContainer.querySelectorAll('.tab').forEach(t => 
+          t.classList.remove('tab-active')
+        );
+        tab.classList.add('tab-active');
+        
+        // Show/hide content panes
+        if (tabName === 'write') {
+          writePane?.classList.remove('hidden');
+          writePane?.classList.add('active');
+          previewPane?.classList.add('hidden');
+          previewPane?.classList.remove('active');
+        } else if (tabName === 'preview') {
+          writePane?.classList.add('hidden');
+          writePane?.classList.remove('active');
+          previewPane?.classList.remove('hidden');
+          previewPane?.classList.add('active');
+          
+          // Render preview when switching to preview tab
+          renderPreview();
+        }
+      });
+    });
+    
+    // Setup automatic preview update
+    if (previewEnabled && textarea) {
+      textarea.addEventListener('input', () => {
+        // Only render if preview tab is active
+        if (previewPane?.classList.contains('active')) {
+          renderPreview();
+        }
+      });
+    }
+    
+    // Load marked.js if needed and available
+    if (previewEnabled && !window.marked) {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+      script.onload = () => {
+        // If preview is active, render it once the library is loaded
+        if (previewPane?.classList.contains('active')) {
+          renderPreview();
+        }
+      };
+      document.head.appendChild(script);
+    }
+  });
+</script>
+
+<style>
+.tab-pane.active {
+  display: block;
+}
+.preview-container {
+  word-break: break-word;
+}
+</style>

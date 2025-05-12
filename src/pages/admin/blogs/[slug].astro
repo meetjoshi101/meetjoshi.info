@@ -1,0 +1,314 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import ContentEditor from '../../../components/admin/ContentEditor.astro';
+
+const { slug } = Astro.params;
+const title = "Edit Blog Post | Admin";
+
+// We would normally fetch blog post data here
+// For now we'll use placeholders assuming API endpoints will be created
+let blogData = {
+  title: "",
+  slug: "",
+  description: "",
+  content: "",
+  featuredImage: "",
+  date: "",
+  draft: false
+};
+
+// If slug is provided, try to fetch the blog post data
+if (slug) {
+  try {
+    // TODO: Implement API to fetch blog post data
+    // This will be replaced with actual API call
+    blogData = {
+      title: "Example Blog Post",
+      slug: "example-blog-post",
+      description: "This is an example blog post description",
+      content: "# Example Content\n\nThis is an example blog post content with markdown formatting.",
+      featuredImage: "/blogs/web-dev-2025.jpg",
+      date: "2025-05-12",
+      draft: false
+    };
+  } catch (error) {
+    console.error("Error fetching blog post:", error);
+  }
+}
+---
+
+<AdminLayout title={title}>
+  <div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">Edit Blog Post</h1>
+      <a href="/admin/blogs" class="btn btn-outline btn-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to List
+      </a>
+    </div>
+    
+    <div class="card bg-base-100 shadow-md">
+      <div class="card-body">
+        <form id="blog-form" class="space-y-6">
+          <div class="alert alert-error hidden" id="error-message">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span id="error-text">Error message</span>
+          </div>
+          
+          <input type="hidden" id="originalSlug" value={blogData.slug} />
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="title" class="label">Title</label>
+              <input 
+                type="text" 
+                id="title" 
+                name="title" 
+                placeholder="Blog post title" 
+                required
+                class="input input-bordered w-full"
+                value={blogData.title}
+              />
+            </div>
+            
+            <div>
+              <label for="slug" class="label">Slug</label>
+              <input 
+                type="text" 
+                id="slug" 
+                name="slug" 
+                placeholder="blog-post-slug" 
+                required
+                class="input input-bordered w-full"
+                value={blogData.slug}
+              />
+              <p class="text-sm mt-1 opacity-70">URL-friendly version of the title</p>
+            </div>
+          </div>
+          
+          <div>
+            <label for="description" class="label">Description</label>
+            <textarea 
+              id="description" 
+              name="description" 
+              placeholder="Short description of the blog post" 
+              required
+              class="textarea textarea-bordered w-full"
+              rows="3"
+            >{blogData.description}</textarea>
+          </div>
+          
+          <div>
+            <label for="featuredImage" class="label">Featured Image URL</label>
+            <input 
+              type="url" 
+              id="featuredImage" 
+              name="featuredImage" 
+              placeholder="https://example.com/image.jpg" 
+              class="input input-bordered w-full"
+              value={blogData.featuredImage}
+            />
+          </div>
+          
+          <div>
+            <label class="label">Date</label>
+            <input 
+              type="date" 
+              id="date" 
+              name="date" 
+              required
+              class="input input-bordered w-full"
+              value={blogData.date}
+            />
+          </div>
+          
+          <div class="form-control">
+            <label class="label cursor-pointer justify-start">
+              <input 
+                type="checkbox" 
+                id="draft" 
+                name="draft" 
+                class="checkbox" 
+                checked={blogData.draft} 
+              />
+              <span class="label-text ml-2">Save as Draft</span> 
+            </label>
+          </div>
+          
+          <div>
+            <label for="content" class="label">Content</label>
+            <ContentEditor content={blogData.content} id="content" minHeight="400px" />
+          </div>
+          
+          <div class="card-actions justify-between">
+            <button type="button" id="delete-btn" class="btn btn-error">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Delete Blog Post
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+              </svg>
+              Update Blog Post
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const titleInput = document.getElementById('title');
+    const slugInput = document.getElementById('slug');
+    const blogForm = document.getElementById('blog-form');
+    const deleteBtn = document.getElementById('delete-btn');
+    const errorMessage = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+    const originalSlugInput = document.getElementById('originalSlug');
+    
+    // Only auto-generate slug if it matches the title pattern
+    let slugManuallyEdited = false;
+    
+    if (titleInput instanceof HTMLInputElement && slugInput instanceof HTMLInputElement) {
+      const originalSlug = originalSlugInput instanceof HTMLInputElement ? originalSlugInput.value : '';
+      
+      titleInput.addEventListener('input', () => {
+        if (!slugManuallyEdited) {
+          const title = titleInput.value;
+          // Convert to lowercase, replace spaces with hyphens, remove special chars
+          const slug = title.toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w-]+/g, '')
+            .replace(/--+/g, '-')
+            .replace(/^-+|-+$/g, '');
+          
+          slugInput.value = slug;
+        }
+      });
+      
+      // Mark slug as manually edited if user changes it
+      slugInput.addEventListener('input', () => {
+        slugManuallyEdited = true;
+      });
+    }
+    
+    // Form submission
+    blogForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (errorMessage) {
+        errorMessage.classList.add('hidden');
+      }
+      
+      try {
+        // Get form data
+        const formData = new FormData(e.target as HTMLFormElement);
+        const contentTextarea = document.getElementById('content');
+        const originalSlug = originalSlugInput instanceof HTMLInputElement ? originalSlugInput.value : '';
+        
+        if (contentTextarea instanceof HTMLTextAreaElement) {
+          formData.append('content', contentTextarea.value);
+        }
+        
+        // Handle draft checkbox
+        const draftCheckbox = document.getElementById('draft');
+        if (draftCheckbox instanceof HTMLInputElement) {
+          formData.set('draft', draftCheckbox.checked.toString());
+        }
+        
+        // Convert FormData to regular object
+        const blogData = Object.fromEntries(formData.entries());
+        
+        // Send API request
+        const response = await fetch(`/api/blogs/${originalSlug}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(blogData),
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Redirect to blog list on success
+          window.location.href = '/admin/blogs';
+        } else {
+          // Show error message
+          if (errorText) {
+            errorText.textContent = data.message || 'Error updating blog post';
+          }
+          
+          if (errorMessage) {
+            errorMessage.classList.remove('hidden');
+          }
+        }
+      } catch (error) {
+        console.error('Error updating blog post:', error);
+        if (errorText) {
+          errorText.textContent = 'An unexpected error occurred';
+        }
+        
+        if (errorMessage) {
+          errorMessage.classList.remove('hidden');
+        }
+      }
+    });
+    
+    // Delete functionality
+    deleteBtn?.addEventListener('click', async () => {
+      // Confirm deletion
+      const confirmation = confirm("Are you sure you want to delete this blog post? This action cannot be undone.");
+      
+      if (!confirmation) {
+        return;
+      }
+      
+      if (errorMessage) {
+        errorMessage.classList.add('hidden');
+      }
+      
+      try {
+        const originalSlug = originalSlugInput instanceof HTMLInputElement ? originalSlugInput.value : '';
+        
+        // Send delete request
+        const response = await fetch(`/api/blogs/${originalSlug}`, {
+          method: 'DELETE',
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Redirect to blog list on success
+          window.location.href = '/admin/blogs';
+        } else {
+          // Show error message
+          if (errorText) {
+            errorText.textContent = data.message || 'Error deleting blog post';
+          }
+          
+          if (errorMessage) {
+            errorMessage.classList.remove('hidden');
+          }
+        }
+      } catch (error) {
+        console.error('Error deleting blog post:', error);
+        if (errorText) {
+          errorText.textContent = 'An unexpected error occurred';
+        }
+        
+        if (errorMessage) {
+          errorMessage.classList.remove('hidden');
+        }
+      }
+    });
+  });
+</script>

@@ -1,0 +1,240 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import ContentEditor from '../../../components/admin/ContentEditor.astro';
+
+const title = "Add New Project | Admin";
+---
+
+<AdminLayout title={title}>
+  <div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">Add New Project</h1>
+      <a href="/admin/projects" class="btn btn-outline btn-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to List
+      </a>
+    </div>
+    
+    <div class="card bg-base-100 shadow-md">
+      <div class="card-body">
+        <form id="project-form" class="space-y-6">
+          <div class="alert alert-error hidden" id="error-message">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span id="error-text">Error message</span>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="title" class="label">Project Title</label>
+              <input 
+                type="text" 
+                id="title" 
+                name="title" 
+                placeholder="Project title" 
+                required
+                class="input input-bordered w-full"
+              />
+            </div>
+            
+            <div>
+              <label for="slug" class="label">Slug</label>
+              <input 
+                type="text" 
+                id="slug" 
+                name="slug" 
+                placeholder="project-slug" 
+                required
+                class="input input-bordered w-full"
+              />
+              <p class="text-sm mt-1 opacity-70">URL-friendly version of the title</p>
+            </div>
+          </div>
+          
+          <div>
+            <label for="description" class="label">Short Description</label>
+            <textarea 
+              id="description" 
+              name="description" 
+              placeholder="Brief description of the project" 
+              required
+              class="textarea textarea-bordered w-full"
+              rows="2"
+            ></textarea>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="thumbnail" class="label">Thumbnail Image URL</label>
+              <input 
+                type="url" 
+                id="thumbnail" 
+                name="thumbnail" 
+                placeholder="https://example.com/image.jpg" 
+                class="input input-bordered w-full"
+              />
+            </div>
+            
+            <div>
+              <label for="demoUrl" class="label">Demo URL (optional)</label>
+              <input 
+                type="url" 
+                id="demoUrl" 
+                name="demoUrl" 
+                placeholder="https://example.com" 
+                class="input input-bordered w-full"
+              />
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="repoUrl" class="label">Repository URL (optional)</label>
+              <input 
+                type="url" 
+                id="repoUrl" 
+                name="repoUrl" 
+                placeholder="https://github.com/username/repo" 
+                class="input input-bordered w-full"
+              />
+            </div>
+            
+            <div>
+              <label for="tags" class="label">Tags (comma separated)</label>
+              <input 
+                type="text" 
+                id="tags" 
+                name="tags" 
+                placeholder="react, typescript, tailwind" 
+                class="input input-bordered w-full"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label for="content" class="label">Project Details</label>
+            <ContentEditor content="" id="content" minHeight="400px" />
+          </div>
+          
+          <div class="form-control">
+            <label class="label cursor-pointer justify-start">
+              <input type="checkbox" id="featured" name="featured" class="checkbox" />
+              <span class="label-text ml-2">Featured Project (shown on homepage)</span> 
+            </label>
+          </div>
+          
+          <div class="card-actions justify-end">
+            <button type="submit" class="btn btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+              </svg>
+              Save Project
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const titleInput = document.getElementById('title');
+    const slugInput = document.getElementById('slug');
+    const projectForm = document.getElementById('project-form');
+    const errorMessage = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+    
+    // Automatically generate slug from title
+    if (titleInput instanceof HTMLInputElement && slugInput instanceof HTMLInputElement) {
+      titleInput.addEventListener('input', () => {
+        const title = titleInput.value;
+        // Convert to lowercase, replace spaces with hyphens, remove special chars
+        const slug = title.toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^\w-]+/g, '')
+          .replace(/--+/g, '-')
+          .replace(/^-+|-+$/g, '');
+        
+        slugInput.value = slug;
+      });
+    }
+    
+    // Form submission
+    projectForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (errorMessage) {
+        errorMessage.classList.add('hidden');
+      }
+      
+      try {
+        // Get form data
+        const formData = new FormData(e.target as HTMLFormElement);
+        const contentTextarea = document.getElementById('content');
+        
+        if (contentTextarea instanceof HTMLTextAreaElement) {
+          formData.append('content', contentTextarea.value);
+        }
+        
+        // Handle featured checkbox
+        const featuredCheckbox = document.getElementById('featured');
+        if (featuredCheckbox instanceof HTMLInputElement) {
+          formData.set('featured', featuredCheckbox.checked.toString());
+        }
+        
+        // Process tags
+        const tagsInput = formData.get('tags');
+        if (typeof tagsInput === 'string') {
+          const tagsArray = tagsInput
+            .split(',')
+            .map(tag => tag.trim())
+            .filter(tag => tag.length > 0);
+          
+          // Replace the string with the array
+          formData.set('tags', JSON.stringify(tagsArray));
+        }
+        
+        // Convert FormData to regular object
+        const projectData = Object.fromEntries(formData.entries());
+        
+        // Send API request
+        const response = await fetch('/api/projects', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(projectData),
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Redirect to project list on success
+          window.location.href = '/admin/projects';
+        } else {
+          // Show error message
+          if (errorText) {
+            errorText.textContent = data.message || 'Error saving project';
+          }
+          
+          if (errorMessage) {
+            errorMessage.classList.remove('hidden');
+          }
+        }
+      } catch (error) {
+        console.error('Error saving project:', error);
+        if (errorText) {
+          errorText.textContent = 'An unexpected error occurred';
+        }
+        
+        if (errorMessage) {
+          errorMessage.classList.remove('hidden');
+        }
+      }
+    });
+  });
+</script>

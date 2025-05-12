@@ -1,0 +1,14 @@
+---
+import { getSessionFromCookie } from '../../lib/auth/session';
+import { isLoggedIn } from '../../lib/auth/auth';
+
+const session = getSessionFromCookie(Astro.request);
+const authenticated = session && isLoggedIn(session);
+
+// If not authenticated, redirect to login page
+if (!authenticated) {
+  return Astro.redirect('/admin/login');
+}
+---
+
+<slot />

@@ -1,0 +1,67 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Get all blog posts
+const blogs = await getCollection('blogs');
+
+// Sort by publish date (newest first)
+blogs.sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+---
+
+<AdminLayout title="Manage Blog Posts | Admin">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="text-2xl font-bold">Blog Posts</h2>
+      <p class="text-base-content/70">Manage your blog posts</p>
+    </div>
+    <a href="/admin/blogs/new" class="btn btn-primary">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      New Post
+    </a>
+  </div>
+  
+  <!-- Blog posts list -->
+  <div class="overflow-x-auto">
+    <table class="table w-full">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Published Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {blogs.map((blog) => (
+          <tr>
+            <td class="font-medium">{blog.data.title}</td>
+            <td>{new Date(blog.data.publishDate).toLocaleDateString()}</td>
+            <td>
+              <span class="badge badge-success">Published</span>
+            </td>
+            <td class="flex gap-2">
+              <a href={`/admin/blogs/edit/${blog.slug}`} class="btn btn-sm btn-outline">
+                Edit
+              </a>
+              <a href={`/blogs/${blog.slug}`} class="btn btn-sm btn-ghost" target="_blank">
+                View
+              </a>
+            </td>
+          </tr>
+        ))}
+        
+        {blogs.length === 0 && (
+          <tr>
+            <td colspan="4" class="text-center py-8">
+              <p class="text-base-content/70">No blog posts found</p>
+              <a href="/admin/blogs/new" class="btn btn-sm btn-outline mt-4">Create your first blog post</a>
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>

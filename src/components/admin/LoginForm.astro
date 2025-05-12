@@ -1,0 +1,128 @@
+---
+// Login form component for admin authentication
+
+// Props definition
+interface Props {
+  formClass?: string;
+  showHeader?: boolean;
+  redirectTo?: string;
+}
+
+const { 
+  formClass = '',  
+  showHeader = true, 
+  redirectTo = '/admin' 
+} = Astro.props;
+---
+
+<form id="login-form" class={`space-y-6 ${formClass}`}>
+  {showHeader && (
+    <div class="text-center">
+      <h2 class="text-2xl font-bold mb-6">Admin Login</h2>
+    </div>
+  )}
+  
+  <div class="alert alert-error hidden" id="error-message">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    <span id="error-text">Invalid credentials</span>
+  </div>
+  
+  <div>
+    <label for="username" class="label">Username</label>
+    <input
+      id="username"
+      name="username"
+      type="text"
+      required
+      class="input input-bordered w-full"
+      placeholder="Username"
+    />
+  </div>
+  
+  <div>
+    <label for="password" class="label">Password</label>
+    <input
+      id="password"
+      name="password"
+      type="password"
+      required
+      class="input input-bordered w-full"
+      placeholder="Password"
+    />
+  </div>
+  
+  <div>
+    <button
+      type="submit"
+      class="btn btn-primary w-full"
+      id="login-button"
+    >
+      <span id="button-text">Sign in</span>
+      <span id="button-loading" class="loading loading-spinner loading-sm hidden"></span>
+    </button>
+  </div>
+</form>
+
+<script define:vars={{ redirectTo }}>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('login-form');
+    const errorMessage = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+    const buttonText = document.getElementById('button-text');
+    const buttonLoading = document.getElementById('button-loading');
+    const loginButton = document.getElementById('login-button');
+    
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Hide any previous errors
+      errorMessage?.classList.add('hidden');
+      
+      // Show loading state
+      buttonText?.classList.add('hidden');
+      buttonLoading?.classList.remove('hidden');
+      if (loginButton && loginButton instanceof HTMLButtonElement) {
+        loginButton.disabled = true;
+      }
+      
+      // Get form values
+      const username = (document.getElementById('username') as HTMLInputElement)?.value;
+      const password = (document.getElementById('password') as HTMLInputElement)?.value;
+      
+      try {
+        // Send login request
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          // Redirect to dashboard on success
+          window.location.href = data.redirectTo || redirectTo;
+        } else {
+          // Show error message
+          if (errorText) errorText.textContent = data.message || 'Login failed';
+          errorMessage?.classList.remove('hidden');
+          
+          // Reset form
+          (document.getElementById('password') as HTMLInputElement).value = '';
+        }
+      } catch (error) {
+        // Show generic error message
+        if (errorText) errorText.textContent = 'An error occurred. Please try again.';
+        errorMessage?.classList.remove('hidden');
+        console.error('Login error:', error);
+      } finally {
+        // Reset button state
+        buttonText?.classList.remove('hidden');
+        buttonLoading?.classList.add('hidden');
+        if (loginButton) (loginButton as HTMLButtonElement).disabled = false;
+      }
+    });
+  });
+</script>
