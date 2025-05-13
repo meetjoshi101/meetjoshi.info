@@ -1,11 +1,11 @@
 import type { APIRoute } from 'astro';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { getSessionFromCookie } from '../../../lib/auth/session';
-import { isLoggedIn } from '../../../lib/auth/auth';
+import { getSessionFromCookie } from '../../lib/auth/session';
+import { isLoggedIn } from '../../lib/auth/auth';
 
 // Helper function to ensure directory exists
-async function ensureDirectoryExists(dirPath) {
+async function ensureDirectoryExists(dirPath: string): Promise<void> {
   try {
     await fs.access(dirPath);
   } catch (error) {
@@ -38,7 +38,8 @@ export const POST: APIRoute = async ({ request }) => {
     
     // Get the file and destination folder from the form data
     const file = formData.get('file');
-    const destination = formData.get('destination') || 'uploads';
+    const destinationValue = formData.get('destination');
+    const destination = typeof destinationValue === 'string' ? destinationValue : 'uploads';
     
     // Validate file
     if (!file || !(file instanceof File)) {

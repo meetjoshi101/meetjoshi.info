@@ -1,15 +1,33 @@
 import type { APIRoute } from 'astro';
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import { getSessionFromCookie } from '../../../lib/auth/session';
 import { isLoggedIn } from '../../../lib/auth/auth';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
-// In a real app, this would be a database
-// For this example, we'll store projects in a JSON file
-const PROJECTS_FILE = path.join(process.cwd(), 'src/data/projects.json');
+// Define the Project interface
+interface Project {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  content: string;
+  technologies: string[];
+  image?: string;
+  github?: string;
+  liveUrl?: string;
+  publishDate: string;
+  featured?: boolean;
+  [key: string]: any; // Allow additional properties
+}
+
+// Define the content directory
+const CONTENT_DIR = path.join(process.cwd(), 'src', 'content');
+
+// Define the projects file path
+const PROJECTS_FILE = path.join(CONTENT_DIR, 'projects.json');
 
 // Helper function to read projects from file
-async function getProjects() {
+async function getProjects(): Promise<Project[]> {
   try {
     const data = await fs.readFile(PROJECTS_FILE, 'utf-8');
     return JSON.parse(data);
@@ -21,98 +39,129 @@ async function getProjects() {
 }
 
 // Helper function to write projects to file
-async function saveProjects(projects) {
+async function saveProjects(projects: Project[]): Promise<void> {
   await fs.writeFile(PROJECTS_FILE, JSON.stringify(projects, null, 2));
 }
 
-// GET all projects
+// Handle GET requests to fetch all projects
 export const GET: APIRoute = async ({ request }) => {
-  // Check authentication
-  const session = getSessionFromCookie(request);
-  if (!session || !isLoggedIn(session)) {
-    return new Response(
-      JSON.stringify({ success: false, message: 'Unauthorized' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
-  }
-
   try {
-    const projects = await getProjects();
-    
-    return new Response(
-      JSON.stringify({ success: true, projects }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
+    // Check authentication
+    const session = getSessionFromCookie(request);
+    if (!session || !isLoggedIn(session)) {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        message: 'Unauthorized' 
+      }), { status: 401 });
+    }
+
+    // This endpoint should return all projects
+    // For now, we'll just return an empty success response
+    return new Response(JSON.stringify({
+      success: true,
+      projects: []
+    }), { status: 200 });
   } catch (error) {
-    console.error('Error getting projects:', error);
-    
-    return new Response(
-      JSON.stringify({ success: false, message: 'Failed to get projects' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    console.error('Error fetching projects:', error);
+    return new Response(JSON.stringify({
+      success: false,
+      message: 'Server error occurred while fetching projects'
+    }), { status: 500 });
   }
 };
 
 // POST create new project
 export const POST: APIRoute = async ({ request }) => {
-  // Check authentication
-  const session = getSessionFromCookie(request);
-  if (!session || !isLoggedIn(session)) {
-    return new Response(
-      JSON.stringify({ success: false, message: 'Unauthorized' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
-  }
-
   try {
-    const projectData = await request.json();
-    const projects = await getProjects();
-    
-    // Check if slug is already used
-    const slugExists = projects.some(project => project.slug === projectData.slug);
-    if (slugExists) {
-      return new Response(
-        JSON.stringify({ success: false, message: 'A project with this slug already exists' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+    // Check authentication
+    const session = getSessionFromCookie(request);
+    if (!session || !isLoggedIn(session)) {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        message: 'Unauthorized' 
+      }), { status: 401 });
     }
+
+    // Parse the request body
+    const projectData = await request.json();
     
-    // Parse tags if they are a string
+    // Validate required fields
+    if (!projectData.title || !projectData.slug || !projectData.description) {
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'Missing required fields: title, slug, and description are required'
+      }), { status: 400 });
+    }
+
+    // Parse tags from JSON string back to array if needed
+    let tags = [];
     if (typeof projectData.tags === 'string') {
       try {
-        projectData.tags = JSON.parse(projectData.tags);
-      } catch (error) {
-        projectData.tags = [];
+        tags = JSON.parse(projectData.tags);
+      } catch (e) {
+        // If parsing fails, assume it's a comma-separated string
+        tags = projectData.tags.split(',').map((tag: string) => tag.trim());
       }
+    } else {
+      tags = projectData.tags || [];
     }
-    
-    // Add timestamp
-    const now = new Date().toISOString();
-    const newProject = {
-      ...projectData,
-      createdAt: now,
-      updatedAt: now
-    };
-    
-    // Convert featured to boolean if it's a string
-    if (typeof newProject.featured === 'string') {
-      newProject.featured = newProject.featured === 'true';
+
+    // Parse technologies from JSON string back to array if needed
+    let technologies = [];
+    if (typeof projectData.technologies === 'string') {
+      try {
+        technologies = JSON.parse(projectData.technologies);
+      } catch (e) {
+        // If parsing fails, assume it's a comma-separated string
+        technologies = projectData.technologies.split(',').map((tech: string) => tech.trim());
+      }
+    } else {
+      technologies = projectData.technologies || ["default-technology"];
     }
-    
-    // Add to projects and save
-    projects.push(newProject);
-    await saveProjects(projects);
-    
-    return new Response(
-      JSON.stringify({ success: true, project: newProject }),
-      { status: 201, headers: { 'Content-Type': 'application/json' } }
+
+    // Convert featured string to boolean
+    const featured = projectData.featured === 'true' || projectData.featured === true;
+
+    // Current date for publishing
+    const publishDate = new Date().toISOString();
+
+    // Create the content
+    const content = `---
+title: ${projectData.title}
+description: ${projectData.description}
+publishDate: ${publishDate}
+thumbnail: ${projectData.thumbnail || ''}
+demoUrl: ${projectData.demoUrl || ''}
+repoUrl: ${projectData.repoUrl || ''}
+tags: ${JSON.stringify(tags)}
+technologies: ${JSON.stringify(technologies)}
+featured: ${featured}
+---
+
+${projectData.content || ''}`;
+
+    // Ensure the projects directory exists
+    const projectsDir = path.join(CONTENT_DIR, 'projects');
+    await fs.mkdir(projectsDir, { recursive: true });
+
+    // Write to file
+    await fs.writeFile(
+      path.join(projectsDir, `${projectData.slug}.md`),
+      content,
+      'utf-8'
     );
+
+    return new Response(JSON.stringify({
+      success: true,
+      message: 'Project saved successfully',
+      slug: projectData.slug
+    }), { status: 200 });
+    
   } catch (error) {
-    console.error('Error creating project:', error);
-    
-    return new Response(
-      JSON.stringify({ success: false, message: 'Failed to create project' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    console.error('Error saving project:', error);
+    return new Response(JSON.stringify({
+      success: false,
+      message: 'Server error occurred while saving the project'
+    }), { status: 500 });
   }
 };

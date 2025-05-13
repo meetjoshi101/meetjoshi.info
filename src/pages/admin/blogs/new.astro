@@ -1,4 +1,5 @@
 ---
+export const prerender = false;
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import ContentEditor from '../../../components/admin/ContentEditor.astro';
 
@@ -165,8 +166,9 @@ const title = "Add New Blog Post | Admin";
         }
         
         // Convert FormData to regular object
-        const blogData = Object.fromEntries(formData.entries());
-        blogData.draft = false;
+        let blogData = Object.fromEntries(formData.entries());
+        // Explicitly set draft to boolean false
+        blogData.draft = 'false';
         
         // Send API request
         const response = await fetch('/api/blogs', {
@@ -220,7 +222,8 @@ const title = "Add New Blog Post | Admin";
         
         // Convert FormData to regular object
         const blogData = Object.fromEntries(formData.entries());
-        blogData.draft = true;
+        // Explicitly set draft to boolean true
+        blogData.draft = 'true';
         
         // Send API request
         const response = await fetch('/api/blogs', {

@@ -86,8 +86,10 @@ const {
       }
       
       // Get form values
-      const username = (document.getElementById('username') as HTMLInputElement)?.value;
-      const password = (document.getElementById('password') as HTMLInputElement)?.value;
+      const usernameInput = document.getElementById('username');
+      const passwordInput = document.getElementById('password');
+      const username = usernameInput instanceof HTMLInputElement ? usernameInput.value : '';
+      const password = passwordInput instanceof HTMLInputElement ? passwordInput.value : '';
       
       try {
         // Send login request
@@ -110,7 +112,10 @@ const {
           errorMessage?.classList.remove('hidden');
           
           // Reset form
-          (document.getElementById('password') as HTMLInputElement).value = '';
+          const passwordField = document.getElementById('password');
+          if (passwordField instanceof HTMLInputElement) {
+            passwordField.value = '';
+          }
         }
       } catch (error) {
         // Show generic error message
@@ -121,7 +126,9 @@ const {
         // Reset button state
         buttonText?.classList.remove('hidden');
         buttonLoading?.classList.add('hidden');
-        if (loginButton) (loginButton as HTMLButtonElement).disabled = false;
+        if (loginButton instanceof HTMLButtonElement) {
+          loginButton.disabled = false;
+        }
       }
     });
   });

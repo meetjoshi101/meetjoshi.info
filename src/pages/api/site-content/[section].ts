@@ -9,10 +9,10 @@ import { isLoggedIn } from '../../../lib/auth/auth';
 const SITE_CONTENT_FILE = path.join(process.cwd(), 'src/data/site-content.json');
 
 // Helper function to read site content from file
-async function getSiteContent() {
+async function getSiteContent(): Promise<SiteContent> {
   try {
     const data = await fs.readFile(SITE_CONTENT_FILE, 'utf-8');
-    return JSON.parse(data);
+    return JSON.parse(data) as SiteContent;
   } catch (error) {
     // If file doesn't exist, create it with empty object
     const defaultContent = {
@@ -54,8 +54,20 @@ async function getSiteContent() {
   }
 }
 
+// Define the SiteContent interface
+interface SiteContentSection {
+  title: string;
+  content: string;
+  metadata: Record<string, any>;
+  updatedAt?: string;
+}
+
+interface SiteContent {
+  [key: string]: SiteContentSection;
+}
+
 // Helper function to write site content to file
-async function saveSiteContent(content) {
+async function saveSiteContent(content: SiteContent): Promise<void> {
   await fs.writeFile(SITE_CONTENT_FILE, JSON.stringify(content, null, 2));
 }
 

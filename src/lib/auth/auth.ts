@@ -1,34 +1,47 @@
 // Core authentication utilities for the admin system
 
-import * as bcrypt from 'bcryptjs';
+// WARNING: Using plain text passwords is NOT secure and should NEVER be used in production
+// This is only for development/testing purposes
 
 // For a simple single-user system, we can hardcode the admin credentials
-// In production, this would ideally be stored in environment variables
+// In production, use environment variables and proper password hashing
 const ADMIN_USER = {
-  username: 'admin', // Replace with actual username
-  // This is a hashed password - never store plain text passwords!
-  passwordHash: '', // Will be replaced with a proper hash
+  username: 'admin',
+  password: 'Meet', // Plain text password - INSECURE!
 };
 
 // Initialize admin credentials (call this on app startup)
 export async function initializeAdmin() {
-  // For demo purposes, we'll create a hash for "adminpassword"
-  // In production, use environment variables for greater security
-  if (!ADMIN_USER.passwordHash) {
-    ADMIN_USER.passwordHash = await bcrypt.hash('adminpassword', 10);
-  }
-}
-
-// Verify login credentials
-export async function verifyCredentials(username: string, password: string): Promise<boolean> {
-  if (username !== ADMIN_USER.username) {
-    return false;
-  }
-  
-  return await bcrypt.compare(password, ADMIN_USER.passwordHash);
+  // No hashing needed with plain text
+  console.log("Using plain text password for development only");
 }
 
 // Simple function to check if user is logged in based on session data
 export function isLoggedIn(session: any): boolean {
   return Boolean(session?.authenticated && session?.username === ADMIN_USER.username);
+}
+
+// Function to authenticate and provide specific error messages
+export async function authenticate(username: string, password: string): Promise<{ success: boolean; message: string }> {
+  // Check if username exists
+  if (username !== ADMIN_USER.username) {
+    return { 
+      success: false, 
+      message: "Invalid username. Please check your credentials and try again." 
+    };
+  }
+  
+  // Check if password is correct (plain text comparison)
+  if (password !== ADMIN_USER.password) {
+    return { 
+      success: false, 
+      message: "Incorrect password. Please try again." 
+    };
+  }
+  
+  // Authentication successful
+  return { 
+    success: true, 
+    message: "Login successful!" 
+  };
 }

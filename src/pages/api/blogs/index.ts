@@ -1,104 +1,166 @@
 import type { APIRoute } from 'astro';
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import { getSessionFromCookie } from '../../../lib/auth/session';
 import { isLoggedIn } from '../../../lib/auth/auth';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
-// In a real app, this would be a database
-// For this example, we'll store blogs in a JSON file
-const BLOGS_FILE = path.join(process.cwd(), 'src/data/blogs.json');
+// Define the content directory
+const CONTENT_DIR = path.join(process.cwd(), 'src', 'content');
 
-// Helper function to read blogs from file
-async function getBlogs() {
+export const POST: APIRoute = async ({ request }) => {
   try {
-    const data = await fs.readFile(BLOGS_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    // If file doesn't exist, create it with empty array
-    await fs.writeFile(BLOGS_FILE, '[]');
-    return [];
-  }
-}
+    // Check authentication
+    const session = getSessionFromCookie(request);
+    if (!session || !isLoggedIn(session)) {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        message: 'Unauthorized' 
+      }), { status: 401 });
+    }
 
-// Helper function to write blogs to file
-async function saveBlogs(blogs) {
-  await fs.writeFile(BLOGS_FILE, JSON.stringify(blogs, null, 2));
-}
-
-// GET all blog posts
-export const GET: APIRoute = async ({ request }) => {
-  // Check authentication
-  const session = getSessionFromCookie(request);
-  if (!session || !isLoggedIn(session)) {
-    return new Response(
-      JSON.stringify({ success: false, message: 'Unauthorized' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
-  }
-
-  try {
-    const blogs = await getBlogs();
+    // Parse the request body
+    const blogData = await request.json();
     
-    return new Response(
-      JSON.stringify({ success: true, blogs }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    // Validate required fields
+    if (!blogData.title || !blogData.slug || !blogData.excerpt) {
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'Missing required fields: title, slug, and excerpt are required'
+      }), { status: 400 });
+    }
+
+    // Parse tags from JSON string back to array if needed
+    let tags = [];
+    if (typeof blogData.tags === 'string') {
+      try {
+        tags = JSON.parse(blogData.tags);
+      } catch (e) {
+        // If parsing fails, assume it's a comma-separated string
+        tags = blogData.tags.split(',').map((tag: string) => tag.trim());
+      }
+    } else {
+      tags = blogData.tags || [];
+    }
+
+    // Current date for publishing
+    const publishDate = blogData.publishDate || new Date().toISOString();
+
+    // Create the content
+    const content = `---
+title: ${blogData.title}
+publishDate: ${publishDate}
+excerpt: ${blogData.excerpt}
+tags: ${JSON.stringify(tags)}
+---
+
+${blogData.content || ''}`;
+
+    // Ensure the blogs directory exists
+    const blogsDir = path.join(CONTENT_DIR, 'blog');
+    await fs.mkdir(blogsDir, { recursive: true });
+
+    // Write to file
+    await fs.writeFile(
+      path.join(blogsDir, `${blogData.slug}.md`),
+      content,
+      'utf-8'
     );
-  } catch (error) {
-    console.error('Error getting blogs:', error);
+
+    return new Response(JSON.stringify({
+      success: true,
+      message: 'Blog post saved successfully',
+      slug: blogData.slug
+    }), { status: 200 });
     
-    return new Response(
-      JSON.stringify({ success: false, message: 'Failed to get blogs' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+  } catch (error) {
+    console.error('Error saving blog post:', error);
+    return new Response(JSON.stringify({
+      success: false,
+      message: 'Server error occurred while saving the blog post'
+    }), { status: 500 });
   }
 };
 
-// POST create new blog post
-export const POST: APIRoute = async ({ request }) => {
-  // Check authentication
-  const session = getSessionFromCookie(request);
-  if (!session || !isLoggedIn(session)) {
-    return new Response(
-      JSON.stringify({ success: false, message: 'Unauthorized' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
-  }
-
+// Handle GET requests to fetch all blogs
+export const GET: APIRoute = async ({ request }) => {
   try {
-    const blogData = await request.json();
-    const blogs = await getBlogs();
+    // Check authentication
+    const session = getSessionFromCookie(request);
+    if (!session || !isLoggedIn(session)) {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        message: 'Unauthorized' 
+      }), { status: 401 });
+    }
+
+    const blogsDir = path.join(CONTENT_DIR, 'blog');
     
-    // Check if slug is already used
-    const slugExists = blogs.some(blog => blog.slug === blogData.slug);
-    if (slugExists) {
-      return new Response(
-        JSON.stringify({ success: false, message: 'A blog post with this slug already exists' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+    // Ensure the directory exists
+    try {
+      await fs.access(blogsDir);
+    } catch {
+      await fs.mkdir(blogsDir, { recursive: true });
+      return new Response(JSON.stringify({
+        success: true,
+        blogs: []
+      }), { status: 200 });
     }
     
-    // Add timestamp
-    const now = new Date().toISOString();
-    const newBlog = {
-      ...blogData,
-      createdAt: now,
-      updatedAt: now
-    };
+    // Get all blog files
+    const files = await fs.readdir(blogsDir);
+    const blogs = [];
     
-    // Add to blogs and save
-    blogs.push(newBlog);
-    await saveBlogs(blogs);
+    for (const file of files) {
+      if (file.endsWith('.md')) {
+        const content = await fs.readFile(path.join(blogsDir, file), 'utf-8');
+        const slug = file.replace('.md', '');
+        
+        // Extract frontmatter
+        const frontmatter = content.split('---')[1];
+        const blogInfo = frontmatter.split('\n')
+          .filter(line => line.trim() !== '')
+          .reduce((acc: any, line) => {
+            const [key, ...valueParts] = line.split(':');
+            const value = valueParts.join(':').trim();
+            
+            if (key && value) {
+              if (key.trim() === 'tags') {
+                try {
+                  acc[key.trim()] = JSON.parse(value);
+                } catch (e) {
+                  acc[key.trim()] = [];
+                }
+              } else {
+                acc[key.trim()] = value;
+              }
+            }
+            return acc;
+          }, {});
+        
+        blogs.push({
+          slug,
+          title: blogInfo.title || 'Untitled',
+          publishDate: blogInfo.publishDate || '',
+          excerpt: blogInfo.excerpt || '',
+          tags: blogInfo.tags || []
+        });
+      }
+    }
     
-    return new Response(
-      JSON.stringify({ success: true, blog: newBlog }),
-      { status: 201, headers: { 'Content-Type': 'application/json' } }
-    );
+    // Sort by publish date (newest first)
+    blogs.sort((a, b) => {
+      return new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime();
+    });
+    
+    return new Response(JSON.stringify({
+      success: true,
+      blogs
+    }), { status: 200 });
   } catch (error) {
-    console.error('Error creating blog:', error);
-    
-    return new Response(
-      JSON.stringify({ success: false, message: 'Failed to create blog post' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    console.error('Error fetching blogs:', error);
+    return new Response(JSON.stringify({
+      success: false,
+      message: 'Server error occurred while fetching blogs'
+    }), { status: 500 });
   }
 };

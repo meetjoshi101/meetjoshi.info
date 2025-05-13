@@ -2,6 +2,9 @@
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import { getCollection } from 'astro:content';
 
+// This page needs to be server-rendered to access request headers for authentication
+export const prerender = false;
+
 // Get blog posts and projects for stats
 const blogs = await getCollection('blogs');
 const projects = await getCollection('projects');

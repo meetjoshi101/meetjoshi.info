@@ -1,5 +1,6 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro';
+export const prerender = false;
+import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { getCollection } from 'astro:content';
 
 // Get all projects
@@ -58,7 +59,7 @@ projects.sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueO
             </td>
             <td>{new Date(project.data.publishDate).toLocaleDateString()}</td>
             <td class="flex gap-2">
-              <a href={`/admin/projects/edit/${project.slug}`} class="btn btn-sm btn-outline">
+              <a href={`/admin/projects/${project.slug}`} class="btn btn-sm btn-outline">
                 Edit
               </a>
               <a href={`/projects/${project.slug}`} class="btn btn-sm btn-ghost" target="_blank">

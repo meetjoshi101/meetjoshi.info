@@ -1,67 +1,119 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro';
-import { getCollection } from 'astro:content';
+export const prerender = false;
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getSessionFromCookie } from '../../../lib/auth/session';
+import { isLoggedIn } from '../../../lib/auth/auth';
 
-// Get all blog posts
-const blogs = await getCollection('blogs');
+// Check authentication
+const session = getSessionFromCookie(Astro.request);
+if (!session || !isLoggedIn(session)) {
+  return Astro.redirect('/admin/login');
+}
 
-// Sort by publish date (newest first)
-blogs.sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+// Define blog type
+interface Blog {
+  title: string;
+  slug: string;
+  tags?: string[];
+  publishDate: string;
+}
+
+// Fetch blogs from API
+let blogs: Blog[] = [];
+try {
+  const response = await fetch(`${Astro.url.origin}/api/blogs`, {
+    headers: {
+      Cookie: Astro.request.headers.get('cookie') || ''
+    }
+  });
+  
+  if (response.ok) {
+    const data = await response.json();
+    if (data.success) {
+      blogs = data.blogs || [];
+    }
+  } else {
+    console.error('Error fetching blogs:', await response.text());
+  }
+} catch (error) {
+  console.error("Error fetching blogs:", error);
+}
 ---
 
 <AdminLayout title="Manage Blog Posts | Admin">
-  <div class="flex justify-between items-center mb-6">
-    <div>
-      <h2 class="text-2xl font-bold">Blog Posts</h2>
-      <p class="text-base-content/70">Manage your blog posts</p>
+  <div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h2 class="text-2xl font-bold">Blog Posts</h2>
+        <p class="text-base-content/70">Manage your blog content</p>
+      </div>
+      <a href="/admin/blogs/new" class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        New Blog Post
+      </a>
     </div>
-    <a href="/admin/blogs/new" class="btn btn-primary">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-      </svg>
-      New Post
-    </a>
-  </div>
-  
-  <!-- Blog posts list -->
-  <div class="overflow-x-auto">
-    <table class="table w-full">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Published Date</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {blogs.map((blog) => (
+    
+    <!-- Blog list -->
+    <div class="overflow-x-auto">
+      <table class="table w-full">
+        <thead>
           <tr>
-            <td class="font-medium">{blog.data.title}</td>
-            <td>{new Date(blog.data.publishDate).toLocaleDateString()}</td>
-            <td>
-              <span class="badge badge-success">Published</span>
-            </td>
-            <td class="flex gap-2">
-              <a href={`/admin/blogs/edit/${blog.slug}`} class="btn btn-sm btn-outline">
-                Edit
-              </a>
-              <a href={`/blogs/${blog.slug}`} class="btn btn-sm btn-ghost" target="_blank">
-                View
-              </a>
-            </td>
+            <th>Title</th>
+            <th>Tags</th>
+            <th>Published Date</th>
+            <th>Actions</th>
           </tr>
-        ))}
-        
-        {blogs.length === 0 && (
-          <tr>
-            <td colspan="4" class="text-center py-8">
-              <p class="text-base-content/70">No blog posts found</p>
-              <a href="/admin/blogs/new" class="btn btn-sm btn-outline mt-4">Create your first blog post</a>
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {blogs.map((blog) => (
+            <tr>
+              <td>
+                <div class="font-medium">{blog.title}</div>
+                <div class="text-sm opacity-70">{blog.slug}</div>
+              </td>
+              <td>
+                <div class="flex flex-wrap gap-1">
+                  {blog.tags?.map((tag: string) => (
+                    <span class="badge badge-sm">{tag}</span>
+                  ))}
+                </div>
+              </td>
+              <td>
+                {new Date(blog.publishDate).toLocaleDateString()}
+              </td>
+              <td class="flex gap-2">
+                <a href={`/admin/blogs/${blog.slug}`} class="btn btn-sm btn-outline">
+                  Edit
+                </a>
+                <a href={`/blog/${blog.slug}`} class="btn btn-sm btn-ghost" target="_blank">
+                  View
+                </a>
+              </td>
+            </tr>
+          ))}
+          
+          {blogs.length === 0 && (
+            <tr>
+              <td colspan="4" class="text-center py-8">
+                <div class="flex flex-col items-center gap-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <div>
+                    <h3 class="text-lg font-medium">No blog posts yet</h3>
+                    <p class="text-sm opacity-70">Create your first blog post to get started</p>
+                  </div>
+                  <a href="/admin/blogs/new" class="btn btn-primary btn-sm">
+                    Create First Blog Post
+                  </a>
+                </div>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   </div>
 </AdminLayout>

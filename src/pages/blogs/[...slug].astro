@@ -3,7 +3,9 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import MainLayout from '../../layouts/MainLayout.astro';
 
 export async function getStaticPaths() {
-    const posts = await getCollection('blogs');
+    const allPosts = await getCollection('blogs');
+    // Only include published posts (non-drafts) in the static paths
+    const posts = allPosts.filter(post => !post.data.draft);
     return posts.map((post) => ({
         params: { slug: post.slug },
         props: { post },

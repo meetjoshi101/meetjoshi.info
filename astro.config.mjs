@@ -6,6 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: 'https://meetjoshi.info',
   prefetch: true,
+  output: 'server', // Enable server-side rendering for all pages
   integrations: [],
   markdown: {
     shikiConfig: {

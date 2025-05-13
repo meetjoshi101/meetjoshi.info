@@ -1,4 +1,4 @@
-import { verifyCredentials } from '../../../lib/auth/auth';
+import { authenticate } from '../../../lib/auth/auth';
 import { createAuthenticatedSession, setSessionCookie } from '../../../lib/auth/session';
 import type { APIRoute } from 'astro';
 
@@ -19,15 +19,15 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
     
-    // Verify credentials
-    const isValid = await verifyCredentials(username, password);
+    // Authenticate using the more specific authenticate function
+    const authResult = await authenticate(username, password);
     
-    if (!isValid) {
-      // Invalid credentials
+    if (!authResult.success) {
+      // Return the specific error message from authenticate
       return new Response(
         JSON.stringify({ 
           success: false, 
-          message: 'Invalid username or password' 
+          message: authResult.message
         }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
       );
@@ -49,13 +49,13 @@ export const POST: APIRoute = async ({ request }) => {
     // Set session cookie
     return setSessionCookie(response, session);
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Login API error:', error);
     
     // Return error response
     return new Response(
       JSON.stringify({ 
         success: false, 
-        message: 'An error occurred during login' 
+        message: 'Server error occurred while processing login request' 
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );

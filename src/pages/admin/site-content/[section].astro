@@ -1,4 +1,5 @@
 ---
+export const prerender = false;
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import ContentEditor from '../../../components/admin/ContentEditor.astro';
 
@@ -18,7 +19,27 @@ const activeSection = contentSections.find(s => s.id === section) || contentSect
 
 // We would normally fetch content data here
 // For now we'll use placeholders assuming API endpoints will be created
-let contentData = {
+interface ContentMetadata {
+  subtitle?: string;
+  ctaText?: string;
+  ctaUrl?: string;
+  image?: string;
+  email?: string;
+  phone?: string;
+  linkedIn?: string;
+  skillGroups?: Array<{
+    title: string;
+    skills: string[];
+  }>;
+}
+
+interface ContentData {
+  title: string;
+  content: string;
+  metadata: ContentMetadata;
+}
+
+let contentData: ContentData = {
   title: "",
   content: "",
   metadata: {}
@@ -119,11 +140,18 @@ try {
             <p class="opacity-70 mb-6">{activeSection.description}</p>
             
             <form id="content-form" class="space-y-6">
-              <div class="alert alert-error hidden" id="error-message">
+              <div role="alert" class="alert alert-error alert-horizontal hidden" id="error-message">
                 <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span id="error-text">Error message</span>
+              </div>
+              
+              <div role="alert" class="alert alert-success alert-horizontal hidden" id="success-message">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="success-text">Content updated successfully</span>
               </div>
               
               <input type="hidden" name="section" value={activeSection.id} />
@@ -278,6 +306,8 @@ try {
     const contentForm = document.getElementById('content-form');
     const errorMessage = document.getElementById('error-message');
     const errorText = document.getElementById('error-text');
+    const successMessage = document.getElementById('success-message');
+    const successText = document.getElementById('success-text');
     
     // Form submission
     contentForm?.addEventListener('submit', async (e) => {
@@ -285,6 +315,10 @@ try {
       
       if (errorMessage) {
         errorMessage.classList.add('hidden');
+      }
+      
+      if (successMessage) {
+        successMessage.classList.add('hidden');
       }
       
       try {
@@ -298,13 +332,17 @@ try {
         }
         
         // Process metadata fields
-        const metadataFields = {};
-        const toDelete = [];
+        interface MetadataFields {
+          [key: string]: string | number | boolean;
+        }
+        
+        const metadataFields: MetadataFields = {};
+        const toDelete: string[] = [];
         
         formData.forEach((value, key) => {
           if (key.startsWith('metadata.')) {
             const metaKey = key.replace('metadata.', '');
-            metadataFields[metaKey] = value;
+            metadataFields[metaKey] = value.toString();
             toDelete.push(key);
           }
         });
@@ -331,10 +369,24 @@ try {
         
         if (response.ok) {
           // Show success message
-          alert('Content updated successfully');
+          if (successText) {
+            successText.textContent = data.message || 'Content updated successfully';
+          }
           
-          // Reload the page to show updated content
-          window.location.reload();
+          if (successMessage) {
+            successMessage.classList.remove('hidden');
+          } else {
+            // Fallback to browser alert if success message element doesn't exist
+            alert('Content updated successfully');
+          }
+          
+          // Scroll to top to see the success message
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          
+          // Reload the page after a short delay to show updated content
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
         } else {
           // Show error message
           if (errorText) {
